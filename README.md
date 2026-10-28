@@ -1,11 +1,11 @@
-# Radar Junior
+# Vichea Laburo
 
 Plataforma de inteligencia de demanda laboral junior/trainee en LATAM: releva portales,
 deduplica las ofertas y las normaliza por empresa, ubicación, modalidad y área.
 
 ```
 apps/web/     # landing + auth + panel (Astro 5 SSR + Supabase)
-job-radar/    # scraper de fuentes públicas (hoy escribe data.json)
+xscraper/     # XScraper: motor de relevamiento (hoy escribe data.json)
 db/           # schema Postgres: supabase.sql (auth + RLS) y schema.sql (portable)
 docs/         # DER explicado y decisiones de arquitectura
 notes/        # apuntes de trabajo
@@ -23,13 +23,18 @@ npm run dev               # http://127.0.0.1:4321
 Sin claves de Supabase la app arranca igual: la landing muestra los datos del scraper y los
 formularios avisan que falta configuración. Ver `apps/web/README.md` para el paso a paso.
 
-## Scraper
+## XScraper
+
+El motor de relevamiento. Releva 7 fuentes públicas, normaliza modalidad/geografía/seniority,
+deduplica entre portales y escribe un snapshot por día.
 
 ```bash
-cd job-radar
-node fetch.mjs    # releva fuentes, filtra y escribe data.json + history/<fecha>.json
-node diff.mjs     # compara los dos últimos snapshots
+cd xscraper
+node cli.mjs          # corrida completa → data.json + history/<fecha>.json
+node cli.mjs --diff   # qué abrió y qué cerró respecto del snapshot anterior
 ```
+
+Detalle del pipeline y cómo agregar una fuente: [`xscraper/README.md`](xscraper/README.md).
 
 ## Base de datos
 

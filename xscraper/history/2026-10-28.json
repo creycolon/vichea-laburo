@@ -1,30 +1,29 @@
 {
   "date": "2026-10-28",
-  "generatedAt": "2026-10-28T22:33:20.252Z",
+  "generatedAt": "2026-10-28T23:11:27.059Z",
   "total": 2233,
-  "kept": 67,
+  "kept": 69,
   "counts": {
-    "oferta": 56,
+    "oferta": 58,
     "formacion": 11,
-    "alta": 67
+    "alta": 69
   },
   "bySource": {
-    "Computrabajo": 37,
-    "Himalayas": 1,
-    "GetOnBoard": 18,
+    "Computrabajo": 39,
+    "GetOnBoard": 19,
     "VacantesDigitales": 5,
     "WWR": 3,
     "RemoteOK": 3
   },
   "byGeo": {
-    "Argentina": 37,
-    "LATAM": 21,
+    "Argentina": 40,
+    "LATAM": 20,
     "Global / remoto": 9
   },
   "byModality": {
-    "presencial": 29,
-    "híbrido": 24,
-    "remoto": 14
+    "presencial": 30,
+    "híbrido": 26,
+    "remoto": 13
   },
   "jobs": [
     {
@@ -33,7 +32,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-junior-de-facturacion-cobranzas-y-proveedores-presencial-caba-en-colegiales-756933090079132061373E686DCF3405#lc=ListOffers-Score4-0",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 0
     },
@@ -43,7 +42,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-trainee-informatico-jr-caba-presencial-en-parque-patricios-4E83E9D23C922D4F61373E686DCF3405#lc=ListOffers-Score4-2",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Desarrollo",
       "source": "Computrabajo",
       "days": 0
     },
@@ -53,57 +52,67 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-field-support-it-soporte-tecnico-informatico-jr-caba-presencial-9-a-18-hs-en-floresta-0CBEC508C579411661373E686DCF3405#lc=ListOffers-Score4-3",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Soporte / IT",
+      "area": "Desarrollo",
+      "source": "Computrabajo",
+      "days": 0
+    },
+    {
+      "title": "Agente de Transporte Aduanero Jr. / Avellaneda, PBA Ref: 21520",
+      "company": "ADN - Recursos Humanos",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-agente-de-transporte-aduanero-jr-avellaneda-pba-ref-21520-adn-recursos-humanos-en-avellaneda-C3A69841F9B62CE461373E686DCF3405#lc=ListOffers-Score0-7",
+      "geo": "Argentina",
+      "modality": "presencial",
+      "area": "Logística / Operaciones",
       "source": "Computrabajo",
       "days": 0
     },
     {
       "title": "Asistente Jr. de Seguros",
       "company": "Dos Argentina",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-asistente-jr-de-seguros-en-san-miguel-7D474342204D56A961373E686DCF3405#lc=ListOffers-Score0-11",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-asistente-jr-de-seguros-en-san-miguel-7D474342204D56A961373E686DCF3405#lc=ListOffers-Score0-12",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 0
     },
     {
       "title": "Liquidador Junior de Impuestos",
       "company": "Fortia RH",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-liquidador-junior-de-impuestos-cordoba-capital-en-cordoba-0DA97BA0BC34E80761373E686DCF3405#lc=ListOffers-Score0-12",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-liquidador-junior-de-impuestos-cordoba-capital-en-cordoba-0DA97BA0BC34E80761373E686DCF3405#lc=ListOffers-Score0-13",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 0
     },
     {
       "title": "Administrativo/a Contable Jr. – Empresa de Tecnología",
       "company": "MJ Consultora RH",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-administrativoa-contable-jr-empresa-de-tecnologia-facturacion-cobranzas-y-gestion-administrativa-en-martinez-F0D335644FB1307B61373E686DCF3405#lc=ListOffers-Score0-15",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-administrativoa-contable-jr-empresa-de-tecnologia-facturacion-cobranzas-y-gestion-administrativa-en-martinez-F0D335644FB1307B61373E686DCF3405#lc=ListOffers-Score0-16",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 0
     },
     {
       "title": "Ejecutivo/a Comercial Junior Bilingüe",
       "company": "Link Solution",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ejecutivoa-comercial-junior-bilingue-zona-belgrano-caba-en-belgrano-D01AC14978E9A15F61373E686DCF3405#lc=ListOffers-Score0-19",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ejecutivoa-comercial-junior-bilingue-zona-belgrano-caba-en-belgrano-D01AC14978E9A15F61373E686DCF3405#lc=ListOffers-Score0-17",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Comercial / Ventas",
       "source": "Computrabajo",
       "days": 0
     },
     {
       "title": "Ref. 21550 Analista de Facturación Jr. Puerto Madero, CABA",
       "company": "ADN - Recursos Humanos",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21550-analista-de-facturacion-jr-puerto-madero-caba-puerto-madero-caba-en-puerto-madero-7AF77C9E90F9CCF161373E686DCF3405#lc=ListOffers-Score4-0",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21550-analista-de-facturacion-jr-puerto-madero-caba-puerto-madero-caba-en-puerto-madero-7E1E1F4FA50B33B261373E686DCF3405#lc=ListOffers-Score4-0",
       "geo": "Argentina",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 0
     },
@@ -120,7 +129,7 @@
     {
       "title": "Analista Jr de Cuentas a Pagar",
       "company": "Gestion Compartida",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-jr-de-cuentas-a-pagar-en-parque-patricios-D0908F29137B99ED61373E686DCF3405#lc=ListOffers-Score4-8",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-jr-de-cuentas-a-pagar-en-parque-patricios-D0908F29137B99ED61373E686DCF3405#lc=ListOffers-Score4-4",
       "geo": "Argentina",
       "modality": "híbrido",
       "area": "Otros",
@@ -133,7 +142,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-recruiter-it-trainee-importante-empresa-de-tecnologia-en-san-nicolas-8D8D778791231C1A61373E686DCF3405#lc=ListOffers-Score4-0",
       "geo": "Argentina",
       "modality": "híbrido",
-      "area": "Soporte / IT",
+      "area": "Otros",
       "source": "Computrabajo",
       "days": 0
     },
@@ -143,7 +152,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-prospectadora-telefonicoa-jr-comercial-b2b-presencial-barracas-caba-excluyente-experiencia-b2b-en-barracas-B78869401AE8FC7861373E686DCF3405#lc=ListOffers-Score4-1",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Comercial / Ventas",
       "source": "Computrabajo",
       "days": 1
     },
@@ -153,34 +162,34 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ingeniero-junior-o-estudiante-avanzado-en-cordoba-01E862C9436224DB61373E686DCF3405#lc=ListOffers-Score0-14",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Desarrollo",
       "source": "Computrabajo",
       "days": 1
     },
     {
       "title": "Ref. 21598 Asistente/administrativo jr / obra social",
       "company": "ADN - Recursos Humanos",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21598-asistenteadministrativo-jr-obra-social-caba-centro-en-san-nicolas-772712D7B839456961373E686DCF3405#lc=ListOffers-Score0-16",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21598-asistenteadministrativo-jr-obra-social-caba-centro-en-san-nicolas-772712D7B839456961373E686DCF3405#lc=ListOffers-Score0-17",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 1
     },
     {
       "title": "Analista de Contabilidad Jr.",
       "company": "",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-de-contabilidad-jr-en-quilmes-F7C0137EDA2EB34C61373E686DCF3405#lc=ListOffers-Score0-17",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-de-contabilidad-jr-en-quilmes-F7C0137EDA2EB34C61373E686DCF3405#lc=ListOffers-Score0-18",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 1
     },
     {
       "title": "Comercio Exterior Jr. (Part Time)",
       "company": "ManpowerGroup",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-comercio-exterior-jr-part-time-en-retiro-49C36F1584E0F91E61373E686DCF3405#lc=ListOffers-Score4-4",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-comercio-exterior-jr-part-time-en-retiro-49C36F1584E0F91E61373E686DCF3405#lc=ListOffers-Score4-2",
       "geo": "Argentina",
       "modality": "híbrido",
       "area": "Otros",
@@ -190,20 +199,20 @@
     {
       "title": "Ref. 21550: Analista de Facturación Jr. / Híbrido Puerto Madero CABA",
       "company": "ADN - Recursos Humanos",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21550-analista-de-facturacion-jr-hibrido-puerto-madero-caba-en-puerto-madero-6C69EB9CB72175FC61373E686DCF3405#lc=ListOffers-Score4-9",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21550-analista-de-facturacion-jr-hibrido-puerto-madero-caba-en-puerto-madero-6C69EB9CB72175FC61373E686DCF3405#lc=ListOffers-Score4-7",
       "geo": "Argentina",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 1
     },
     {
       "title": "38oes Analista de facturación jr / Híbrido / Caba",
       "company": "Cona Consultores SRL",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-38oes-analista-de-facturacion-jr-hibrido-caba-en-puerto-madero-D7166E1FC508043061373E686DCF3405#lc=ListOffers-Score4-12",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-38oes-analista-de-facturacion-jr-hibrido-caba-en-puerto-madero-D7166E1FC508043061373E686DCF3405#lc=ListOffers-Score4-8",
       "geo": "Argentina",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 1
     },
@@ -213,7 +222,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ingeniero-juniortecnico-presencial-zona-maipu-en-maipu-FC4B5E9CA5A5ED3761373E686DCF3405#lc=ListOffers-Score4-5",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Desarrollo",
       "source": "Computrabajo",
       "days": 2
     },
@@ -223,7 +232,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-asistente-comercial-b2b-jr-presencial-barracas-caba-prospeccion-telefonica-b2b-en-barracas-C6F755E4F39F854861373E686DCF3405#lc=ListOffers-Score4-6",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Comercial / Ventas",
       "source": "Computrabajo",
       "days": 2
     },
@@ -233,37 +242,47 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-1263cc-trainees-recursos-humanos--mitad-carrera-aprobada-6-hs-presenciales-en-belgrano-32942A2830CE018561373E686DCF3405#lc=ListOffers-Score4-1",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "RRHH / Reclutamiento",
       "source": "Computrabajo",
       "days": 2
     },
     {
       "title": "Comercial Junior",
       "company": "OENOLAB",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-comercial-junior-en-las-heras-1B8728810E51E62B61373E686DCF3405#lc=ListOffers-Score4-13",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-comercial-junior-en-las-heras-1B8728810E51E62B61373E686DCF3405#lc=ListOffers-Score4-9",
       "geo": "Argentina",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Comercial / Ventas",
       "source": "Computrabajo",
       "days": 2
     },
     {
       "title": "Auditor Externo (Junior)",
       "company": "hiNext",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-auditor-externo-junior-en-tigre-185649E166E6B07B61373E686DCF3405#lc=ListOffers-Score4-14",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-auditor-externo-junior-en-tigre-185649E166E6B07B61373E686DCF3405#lc=ListOffers-Score4-12",
       "geo": "Argentina",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 2
     },
     {
       "title": "Analista Jr. Liquidación de Sueldos",
       "company": "Gestion Compartida",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-jr-liquidacion-de-sueldos-en-parque-patricios-B3D9C30672E17A3661373E686DCF3405#lc=ListOffers-Score4-15",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-jr-liquidacion-de-sueldos-en-parque-patricios-B3D9C30672E17A3661373E686DCF3405#lc=ListOffers-Score4-13",
       "geo": "Argentina",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Administración / Contable",
+      "source": "Computrabajo",
+      "days": 2
+    },
+    {
+      "title": "Analista Junior de Facturación y Cobranzas",
+      "company": "FOXBOX GROUP",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-junior-de-facturacion-y-cobranzas-en-la-calera-96EF880F014D7BF061373E686DCF3405#lc=ListOffers-Score4-17",
+      "geo": "Argentina",
+      "modality": "híbrido",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 2
     },
@@ -273,7 +292,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-auxiliar-de-logistica-jr-ssr--estudiante-de-logistica-presencial-cordoba-en-cordoba-6B5A795CB49CBD7A61373E686DCF3405#lc=ListOffers-Score4-7",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 3
     },
@@ -283,7 +302,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-trainee-informatico-jr-vicente-lopez-olivos-zona-norte-presencial-en-parque-patricios-C317C7A1CEBA8DAB61373E686DCF3405#lc=ListOffers-Score4-8",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Desarrollo",
       "source": "Computrabajo",
       "days": 3
     },
@@ -310,10 +329,10 @@
     {
       "title": "Profesional en Mineria para Comercial Tecnico Jr",
       "company": "Adecco Argentina S.A.",
-      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-profesional-en-mineria-para-comercial-tecnico-jr-en-mendoza-FD93C1CBEDBCFB4361373E686DCF3405#lc=ListOffers-Score4-0",
+      "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-profesional-en-mineria-para-comercial-tecnico-jr-en-mendoza-FD93C1CBEDBCFB4361373E686DCF3405#lc=ListOffers-Score4-2",
       "geo": "Argentina",
       "modality": "remoto",
-      "area": "Otros",
+      "area": "Comercial / Ventas",
       "source": "Computrabajo",
       "days": 3
     },
@@ -333,7 +352,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-administrativo-trainee-en-villa-martelli-D75300F8E50A0E5661373E686DCF3405#lc=ListOffers-Score3-6",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 5
     },
@@ -363,7 +382,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-recruiter-it-trainee-con-ingles-avanzado-importante-empresa-de-tecnologia-en-san-nicolas-9679F6053CF835F261373E686DCF3405#lc=ListOffers-Score4-1",
       "geo": "Argentina",
       "modality": "híbrido",
-      "area": "Soporte / IT",
+      "area": "Otros",
       "source": "Computrabajo",
       "days": 7
     },
@@ -373,9 +392,19 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-contable-junior-presencial-en-belgrano-7A275360DAC1AE1861373E686DCF3405#lc=ListOffers-Score4-17",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": 30
+    },
+    {
+      "title": "Ejecutivo de Onboarding Junior",
+      "company": "AgendaPro",
+      "url": "https://www.getonbrd.com/jobs/ejecutivo-de-onboarding-junior-agendapro-buenos-aires-4848",
+      "geo": "Argentina",
+      "modality": "híbrido",
+      "area": "Comercial / Ventas",
+      "source": "GetOnBoard",
+      "days": 38
     },
     {
       "title": "auxiliar de contador Jr Para Estudio contable",
@@ -383,7 +412,7 @@
       "url": "https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-auxiliar-de-contador-jr-para-estudio-contable-presencial-en-retiro-494E382D36E1986A61373E686DCF3405#lc=ListOffers-Score4-15",
       "geo": "Argentina",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "Computrabajo",
       "days": null
     },
@@ -398,22 +427,12 @@
       "days": null
     },
     {
-      "title": "Junior Video Editor",
-      "company": "HIGHSCALE",
-      "url": "https://himalayas.app/companies/highscale/jobs/junior-video-editor-5488587163?utm_source=api",
-      "geo": "LATAM",
-      "modality": "remoto",
-      "area": "Otros",
-      "source": "Himalayas",
-      "days": 0
-    },
-    {
       "title": "Trainee Account Executive (Ae)",
       "company": "Zerviz Technologies",
       "url": "https://www.getonbrd.com/jobs/practicante-ejecutivo-a-comercial-zerviz-technologies-santiago",
       "geo": "LATAM",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Comercial / Ventas",
       "source": "GetOnBoard",
       "days": 0
     },
@@ -493,7 +512,7 @@
       "url": "https://www.getonbrd.com/jobs/consultor-a-salesforce-junior-lisit-santiago-ebf2",
       "geo": "LATAM",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Comercial / Ventas",
       "source": "GetOnBoard",
       "days": 22
     },
@@ -503,7 +522,7 @@
       "url": "https://www.getonbrd.com/jobs/ingeniero-trainee-industrial-agrosuper-rancagua-1685",
       "geo": "LATAM",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Desarrollo",
       "source": "GetOnBoard",
       "days": 27
     },
@@ -513,7 +532,7 @@
       "url": "https://www.getonbrd.com/jobs/asistente-de-gerencia-junior-portugues-e-ingles-omnix-ai-corp-santiago",
       "geo": "LATAM",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "Administración / Contable",
       "source": "GetOnBoard",
       "days": 31
     },
@@ -523,7 +542,7 @@
       "url": "https://www.getonbrd.com/jobs/ejecutivo-de-onboarding-junior-agendapro-ciudad-de-mexico",
       "geo": "LATAM",
       "modality": "presencial",
-      "area": "Otros",
+      "area": "Comercial / Ventas",
       "source": "GetOnBoard",
       "days": 38
     },
@@ -533,7 +552,7 @@
       "url": "https://www.getonbrd.com/jobs/business-analyst-junior-analista-de-procesos-bc-tecnologia-santiago",
       "geo": "LATAM",
       "modality": "presencial",
-      "area": "Producto",
+      "area": "Otros",
       "source": "GetOnBoard",
       "days": 43
     },
@@ -553,7 +572,7 @@
       "url": "https://www.linkedin.com/feed/update/urn:li:activity:7499210015233425408",
       "geo": "LATAM",
       "modality": "híbrido",
-      "area": "Otros",
+      "area": "RRHH / Reclutamiento",
       "source": "VacantesDigitales",
       "days": 57
     },
@@ -563,7 +582,7 @@
       "url": "https://www.getonbrd.com/jobs/finance-intern-agendapro-santiago",
       "geo": "LATAM",
       "modality": "presencial",
-      "area": "Finanzas / Admin",
+      "area": "Otros",
       "source": "GetOnBoard",
       "days": 78
     },

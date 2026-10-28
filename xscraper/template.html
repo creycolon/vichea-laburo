@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Radar junior / trainee</title>
+<title>Vichea Laburo — junior / trainee</title>
 <style>
   :root {
     --bg:#0e1116; --panel:#161b22; --panel2:#1c232c; --line:#2a333f;
@@ -95,7 +95,7 @@
 </head>
 <body>
 <header>
-  <h1>Radar junior / trainee</h1>
+  <h1>Vichea Laburo — junior / trainee</h1>
   <div class="sub" id="sub"></div>
   <div class="stats" id="stats"></div>
   <div style="margin-top:16px"><button class="ghost" id="openSettings">⚙ Programación de actualizaciones</button></div>
@@ -249,7 +249,7 @@ render();
 
 // ---------- pantalla de programación ----------
 const SRC_ALL = [...new Set(DATA.jobs.map(j => j.source))].sort();
-const CFG_KEY = 'radar.schedule.v1';
+const CFG_KEY = 'vichea.schedule.v1';
 const DEFAULTS = {
   freq: 'daily', time: '08:00', dow: '1',
   sources: Object.fromEntries(SRC_ALL.map(s => [s, true])),
@@ -314,7 +314,7 @@ function nextRuns(c, n = 3) {
 function drawSchedule() {
   const cron = cronOf(cfg);
   const act = Object.values(cfg.sources).filter(Boolean).length;
-  const cmd = 'cd /srv/job-radar && /usr/bin/node fetch.mjs >> cron.log 2>&1';
+  const cmd = 'cd /srv/xscraper && /usr/bin/node fetch.mjs >> cron.log 2>&1';
   if (!cron) {
     $('cronOut').textContent = 'Sin automatización: se ejecuta solo a pedido.\n\nPara el servidor no hace falta instalar nada.';
   } else {

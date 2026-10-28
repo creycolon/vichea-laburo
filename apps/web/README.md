@@ -1,4 +1,4 @@
-# apps/web — Radar Junior
+# apps/web — Vichea Laburo
 
 Landing + autenticación + panel. Astro 5 en modo SSR con adapter de Node; la sesión la maneja
 Supabase Auth y las reglas viven en la base (RLS).

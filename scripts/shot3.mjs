@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 const ID = '7484236EC8D20ED076FD69D8D7762119';
 const list = await (await fetch('http://127.0.0.1:9340/json/list')).json();
-const t = list.find(x => x.id === ID) ?? list.find(x => x.type === 'page' && x.url.includes('job-radar/index.html'));
+const t = list.find(x => x.id === ID) ?? list.find(x => x.type === 'page' && x.url.includes('xscraper/index.html'));
 const ws = new WebSocket(t.webSocketDebuggerUrl);
 let id = 0; const pend = new Map();
 const call = (m, p = {}, ms = 8000) => new Promise(res => {

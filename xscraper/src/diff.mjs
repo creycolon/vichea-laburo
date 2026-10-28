@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const dir = path.join(path.dirname(new URL(import.meta.url).pathname), 'history');
+const dir = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', 'history');
 const files = fs.readdirSync(dir).filter(f => f.endsWith('.json')).sort();
 if (files.length < 2) {
   console.log(`todavía hay un solo snapshot (${files[0] ?? 'ninguno'}). Hace falta otro día para comparar.`);

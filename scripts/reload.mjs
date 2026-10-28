@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 const list = await (await fetch('http://127.0.0.1:9340/json/list')).json();
-const t = list.find(x => x.type === 'page' && x.url.includes('job-radar/index.html'));
+const t = list.find(x => x.type === 'page' && x.url.includes('xscraper/index.html'));
 if (!t) { console.log('la pestaña del radar ya no está abierta'); process.exit(1); }
 const ws = new WebSocket(t.webSocketDebuggerUrl);
 let id = 0; const pend = new Map();

@@ -19,13 +19,13 @@ const EMPTY: Stats = {
 };
 
 /**
- * Lee el snapshot que produce job-radar. Es un puente temporario: cuando el scraper
+ * Lee el snapshot que produce xscraper. Es un puente temporario: cuando el scraper
  * escriba en Postgres, esta función pasa a ser una query y la landing no cambia.
  */
 export function getStats(): Stats {
   const candidates = [
-    path.resolve(process.cwd(), '../../job-radar/data.json'),
-    path.resolve(process.cwd(), 'job-radar/data.json'),
+    path.resolve(process.cwd(), '../../xscraper/data.json'),
+    path.resolve(process.cwd(), 'xscraper/data.json'),
   ];
   for (const file of candidates) {
     try {

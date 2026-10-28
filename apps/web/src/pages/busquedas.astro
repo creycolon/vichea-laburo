@@ -21,7 +21,7 @@ const areas = [...new Set(jobs.map((j) => j.area))].sort();
 const ok = Astro.url.searchParams.get('ok');
 ---
 
-<Layout title="Búsquedas — Radar Junior">
+<Layout title="Búsquedas — Vichea Laburo">
   <main>
     <div class="wrap">
       <div class="panel-head">
@@ -112,7 +112,7 @@ const ok = Astro.url.searchParams.get('ok');
     $('q').addEventListener('input', (e) => { state.q = e.target.value.toLowerCase().trim(); render(); });
 
     // --- guardado ---
-    const LOCAL_KEY = 'radar.searches.v1';
+    const LOCAL_KEY = 'vichea.searches.v1';
     const localSearches = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]'); } catch { return []; } };
     const renderGuardadas = () => {
       const items = configured ? guardadas : localSearches();

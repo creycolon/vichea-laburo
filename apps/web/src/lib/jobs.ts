@@ -18,8 +18,8 @@ export type JobRow = {
  */
 export function getJobs(): JobRow[] {
   const candidates = [
-    path.resolve(process.cwd(), '../../job-radar/data.json'),
-    path.resolve(process.cwd(), 'job-radar/data.json'),
+    path.resolve(process.cwd(), '../../xscraper/data.json'),
+    path.resolve(process.cwd(), 'xscraper/data.json'),
   ];
   for (const file of candidates) {
     try {

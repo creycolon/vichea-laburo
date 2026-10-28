@@ -1,0 +1,11 @@
+{
+  "name": "xscraper",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Motor de relevamiento y normalización de ofertas junior/trainee para Vichea Laburo",
+  "scripts": {
+    "run": "node cli.mjs",
+    "diff": "node cli.mjs --diff"
+  }
+}

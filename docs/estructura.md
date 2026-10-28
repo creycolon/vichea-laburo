@@ -11,7 +11,7 @@
 | UI | **CSS propio** (sin framework) | Control total del diseño de la landing; cero dependencias de UI |
 | Email | **SMTP de Supabase / Resend** | Verificación y reset ya salen por Supabase Auth |
 | Deploy | **Vercel/Netlify (app) + Supabase (DB+Auth)** | Sin VPS; el cron del scraper corre aparte |
-| Scraper | **Proceso aparte** (Node + cron) | No debe correr en el request de un usuario, ni en el runtime de la landing |
+| XScraper | **Proceso aparte** (Node + cron) | No debe correr en el request de un usuario, ni en el runtime de la landing |
 
 Separar el scraper de la app no es purismo: son ciclos de vida distintos. La app escala con requests; el scraper corre por reloj, tarda minutos y puede fallar solo.
 
@@ -42,16 +42,20 @@ Separar el scraper de la app no es purismo: son ciclos de vida distintos. La app
 │       │   ├── middleware.ts          # protege /panel, hidrata locals.user
 │       │   └── styles/global.css
 │       └── .env.example
-└── job-radar/                 # el scraper actual (aún escribe data.json)
-    ├── fetch.mjs
-    ├── diff.mjs
-    ├── template.html
-    └── history/               # un snapshot por día
+└── xscraper/                 # XScraper: motor de relevamiento (aún escribe data.json)
+    ├── cli.mjs               # entrada: run | --diff
+    ├── src/
+    │   ├── engine.mjs        # orquestación + un bloque por fuente
+    │   ├── normalize.mjs     # seniority, área, geografía, dedupe key
+    │   └── diff.mjs          # comparación entre snapshots
+    ├── template.html         # vista estática
+    ├── data.json             # estado actual
+    └── history/              # un snapshot por día
 ```
 
 ## Las tres capas y su contrato
 
-**1. Ingesta (scraper).** Escribe `crawl_runs`, `job_source_records`, `jobs`, `job_events`. Nunca lee de la app. Es el único que habla con portales externos.
+**1. Ingesta (XScraper).** Escribe `crawl_runs`, `job_source_records`, `jobs`, `job_events`. Nunca lee de la app. Es el único que habla con portales externos.
 
 **2. Dominio (app).** Lee `jobs` ya normalizado. No sabe qué es un selector CSS ni que Computrabajo existe.
 

@@ -1,5 +1,5 @@
 -- ============================================================================
--- Radar Junior — schema para Supabase
+-- Vichea Laburo — schema para Supabase
 -- Ejecutar entero en el SQL Editor del proyecto. Idempotente donde se puede.
 -- Auth la resuelve Supabase (auth.users); acá vive todo lo de negocio + RLS.
 -- La versión portable sin Supabase queda en db/schema.sql como referencia.

@@ -1,38 +1,12 @@
-// Radar de oportunidades junior/trainee — junta fuentes públicas, filtra y genera una página.
+// XScraper — releva fuentes públicas de empleo junior/trainee, filtra y genera una página.
 import fs from 'node:fs';
 import path from 'node:path';
+import { JUNIOR, SENIOR, FORMACION, classify, geo, clean, seniorityOf, dedupeKey } from './normalize.mjs';
 
-const OUT_DIR = path.dirname(new URL(import.meta.url).pathname);
+// Out dir: la raíz de xscraper (este archivo vive en src/)
+const OUT_DIR = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36';
 const TIMEOUT = 25_000;
-
-const JUNIOR = /\b(junior|jr\.?(?=\s|$)|trainee|entry[-\s]?level|internship|interns?\b|graduate|apprentice|pasant[ií]a|becari[oa]|sin experiencia|no experience|recent grad|early career|aprendiz|primer empleo|reci[eé]n recibid)/i;
-const SENIOR = /\b(senior|sr\.?|lead|head|director|manager|principal|staff|architect|vp|chief|cto|ceo|founder)\b/i;
-const FORMACION = /\b(trainee|apprentice|graduate (program|scheme)|programa de formaci[oó]n|bootcamp|beca|pasant[ií]a|internship|aprendiz|pr[aá]cticas profesionales)/i;
-
-const AREAS = [
-  ['Datos', /\b(data|datos|analytics|bi\b|machine learning|ml\b|ai\b|inteligencia artificial|scientist|etl)\b/i],
-  ['Desarrollo', /\b(developer|desarrollador|engineer|software|frontend|front-end|backend|back-end|full[-\s]?stack|programmer|devops|sre|qa|tester|android|ios|mobile)\b/i],
-  ['Diseño', /\b(design|dise[ñn]o|ux|ui|product design|graphic)\b/i],
-  ['Producto', /\b(product|producto|pm\b|owner|scrum|analyst)\b/i],
-  ['Marketing', /\b(marketing|growth|seo|content|contenido|community|social media|copy)\b/i],
-  ['Finanzas / Admin', /\b(finance|finanzas|accounting|contab|admin|administrativ|payroll|billing|risk|riesgo)\b/i],
-  ['Soporte / IT', /\b(support|soporte|help ?desk|customer success|technical support|it\b|sysadmin|networking)\b/i],
-];
-
-const classify = (text) => (AREAS.find(([, re]) => re.test(text)) ?? ['Otros'])[0];
-
-const geo = (loc = '', remote = false) => {
-  const l = loc.toLowerCase().trim();
-  if (/argentin|buenos aires|caba|gba|capital federal|capital|.*,\s*(c[oó]rdoba|santa fe|mendoza|salta|tucum)/.test(l)) return 'Argentina';
-  if (/latam|latin america|south america|americas|brazil|chile|uruguay|colombia|m[eé]xico|per[uú]/.test(l)) return 'LATAM';
-  if (/worldwide|anywhere|global/.test(l)) return 'Global / remoto';
-  if (!l && remote) return 'Global / remoto';
-  if (/remote/.test(l) && !/usa|united states|canada|europe|germany|uk\b|india|philipp/.test(l)) return 'Global / remoto';
-  return 'Otra';
-};
-
-const clean = (s = '') => s.replace(/<[^>]*>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
 
 async function grab(url, kind = 'json') {
   const ctl = new AbortController();
@@ -246,7 +220,7 @@ for (const j of jobs) {
   if (SENIOR.test(j.title)) continue;                 // un "Junior" no dice Director ni Manager
   if (!titleHit && !form && !j.juniorOk) continue;      // juniorOk: la fuente ya lo clasificó como junior
 
-  const key = `${j.company}`.toLowerCase().replace(/\W/g, '') + '|' + j.title.toLowerCase().replace(/\W/g, '');
+  const key = dedupeKey(j.company, j.title, geo(j.location, j.remote));
   if (seen.has(key)) continue;
   seen.add(key);
 
@@ -258,6 +232,7 @@ for (const j of jobs) {
     ...j,
     text: undefined,
     area: classify(`${j.title} ${j.tags.join(' ')}`),
+    seniority: seniorityOf(`${j.title} ${j.tags.join(' ')}`),
     geo: g,
     modality: j.modality ?? 'remoto',
     kind: form ? 'formacion' : 'oferta',
