@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar junior / trainee</title>
+<style>
+  :root {
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c232c; --line:#2a333f;
+    --txt:#e6edf3; --dim:#8b98a5; --accent:#4cc38a; --accent2:#5aa9f0; --warn:#f0b95a;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  header { padding:28px 32px 18px; border-bottom:1px solid var(--line); }
+  h1 { margin:0 0 6px; font-size:22px; letter-spacing:-.02em; }
+  .sub { color:var(--dim); font-size:13px; }
+  .stats { display:flex; gap:22px; margin-top:16px; flex-wrap:wrap; }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 16px; min-width:104px; }
+  .stat b { display:block; font-size:20px; }
+  .stat span { color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+  .controls { padding:16px 32px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+              position:sticky; top:0; background:rgba(14,17,22,.95); backdrop-filter:blur(8px);
+              border-bottom:1px solid var(--line); z-index:5; }
+  input[type=search] { background:var(--panel); border:1px solid var(--line); color:var(--txt);
+    border-radius:8px; padding:9px 12px; min-width:260px; font-size:14px; outline:none; }
+  input[type=search]:focus { border-color:var(--accent2); }
+  .chip { background:var(--panel); border:1px solid var(--line); color:var(--dim);
+    border-radius:999px; padding:6px 13px; font-size:12.5px; cursor:pointer; user-select:none; }
+  .chip:hover { color:var(--txt); border-color:#3a4653; }
+  .chip.on { background:#12351f; border-color:var(--accent); color:var(--accent); }
+  .chip.on.geo { background:#12293b; border-color:var(--accent2); color:var(--accent2); }
+  main { padding:22px 32px 60px; display:grid; gap:14px;
+         grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+          display:flex; flex-direction:column; gap:9px; transition:border-color .15s, transform .15s; }
+  .card:hover { border-color:#3d4b5c; transform:translateY(-1px); }
+  .card h2 { margin:0; font-size:15.5px; font-weight:600; line-height:1.35; }
+  .card h2 a { color:var(--txt); text-decoration:none; }
+  .card h2 a:hover { color:var(--accent2); }
+  .co { color:var(--dim); font-size:13px; }
+  .badges { display:flex; gap:6px; flex-wrap:wrap; margin-top:2px; }
+  .b { font-size:11px; padding:3px 8px; border-radius:6px; background:var(--panel2);
+       border:1px solid var(--line); color:var(--dim); }
+  .b.area { color:#c9b6ff; border-color:#3b2f5e; background:#1e1830; }
+  .b.geo { color:var(--accent2); border-color:#22384d; background:#111d28; }
+  .b.formacion { color:var(--warn); border-color:#4a3a1c; background:#241c0e; }
+  .b.mod { color:#8fd6c8; border-color:#1f3f3a; background:#0f201e; }
+  .b.mod.mod-h { color:#f0b95a; border-color:#4a3a1c; background:#241c0e; }
+  .b.mod.mod-p { color:#c9b6ff; border-color:#3b2f5e; background:#1e1830; }
+  .b.nuevo { color:var(--accent); border-color:#1e4130; background:#0f2419; }
+  .b.dudoso { color:#d68c8c; border-color:#4a2626; background:#241212; }
+  .meta { margin-top:auto; display:flex; justify-content:space-between; align-items:center;
+          font-size:12px; color:var(--dim); padding-top:8px; border-top:1px dashed var(--line); }
+  .meta a { color:var(--accent2); text-decoration:none; }
+  footer { padding:0 32px 40px; color:var(--dim); font-size:12px; }
+  .empty { grid-column:1/-1; text-align:center; color:var(--dim); padding:60px 0; }
+  .links { padding:0 32px 26px; }
+  .links h3 { margin:0 0 10px; font-size:13px; color:var(--dim); font-weight:600;
+              text-transform:uppercase; letter-spacing:.07em; }
+  .links .row { display:flex; gap:8px; flex-wrap:wrap; }
+  .links a { font-size:12.5px; color:var(--dim); text-decoration:none; border:1px solid var(--line);
+             background:var(--panel); padding:7px 12px; border-radius:8px; }
+  .links a:hover { color:var(--accent2); border-color:#3a4653; }
+  .ghost { background:transparent; border:1px solid var(--line); color:var(--dim); border-radius:8px;
+           padding:7px 12px; font-size:12.5px; cursor:pointer; }
+  .ghost:hover { color:var(--txt); border-color:#3a4653; }
+  .overlay { position:fixed; inset:0; background:rgba(5,8,12,.78); backdrop-filter:blur(4px);
+             display:none; align-items:flex-start; justify-content:center; z-index:50; padding:48px 16px; overflow:auto; }
+  .overlay.on { display:flex; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; width:min(680px,100%);
+           padding:24px 26px; }
+  .panel h2 { margin:0 0 4px; font-size:18px; }
+  .panel .hint { color:var(--dim); font-size:12.5px; margin:0 0 18px; line-height:1.5; }
+  .frow { display:grid; grid-template-columns:130px 1fr; gap:10px 14px; align-items:center; margin-bottom:12px; }
+  .frow > span { color:var(--dim); font-size:12.5px; }
+  select, input[type=time] { background:var(--panel2); border:1px solid var(--line); color:var(--txt);
+           border-radius:8px; padding:8px 10px; font-size:13.5px; }
+  .srcs { display:flex; flex-wrap:wrap; gap:8px; }
+  .srcs label { font-size:12.5px; color:var(--dim); background:var(--panel2); border:1px solid var(--line);
+                padding:5px 10px; border-radius:7px; display:flex; gap:6px; align-items:center; cursor:pointer; }
+  .out { background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:12px 14px;
+         font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; color:#9ae6b4;
+         white-space:pre-wrap; word-break:break-word; margin:14px 0 0; }
+  .out.dim { color:var(--dim); }
+  .actions { display:flex; gap:8px; margin-top:18px; }
+  .actions button { border-radius:8px; padding:9px 16px; font-size:13px; cursor:pointer; border:1px solid var(--line);
+                    background:var(--panel2); color:var(--txt); }
+  .actions button.primary { background:#12351f; border-color:var(--accent); color:var(--accent); }
+  .actions button:hover { border-color:#3a4653; }
+  .saved { color:var(--accent); font-size:12.5px; margin-left:auto; align-self:center; }
+  .err { margin:0 32px 20px; padding:10px 14px; border-radius:8px; font-size:12.5px;
+         background:#241a0e; border:1px solid #4a3a1c; color:var(--warn); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Radar junior / trainee</h1>
+  <div class="sub" id="sub"></div>
+  <div class="stats" id="stats"></div>
+  <div style="margin-top:16px"><button class="ghost" id="openSettings">⚙ Programación de actualizaciones</button></div>
+</header>
+
+<div class="controls">
+  <input type="search" id="q" placeholder="Buscar puesto, empresa, tecnología…">
+  <span class="chip on" data-k="kind" data-v="todas">Todas</span>
+  <span class="chip" data-k="kind" data-v="oferta">Ofertas</span>
+  <span class="chip" data-k="kind" data-v="formacion">Formación</span>
+  <span id="areas"></span>
+  <span id="mods"></span>
+  <span id="geos"></span>
+</div>
+
+<main id="grid"></main>
+<section class="links">
+  <h3>Búsquedas directas — tableros locales que no permiten automatización</h3>
+  <div class="row">
+    <a href="https://www.computrabajo.com.ar/trabajo-de-junior" target="_blank" rel="noopener">Computrabajo · junior</a>
+    <a href="https://www.computrabajo.com.ar/trabajo-de-pasantia" target="_blank" rel="noopener">Computrabajo · pasantías</a>
+    <a href="https://www.zonajobs.com.ar/empleos-busqueda-junior.html" target="_blank" rel="noopener">Zonajobs · junior</a>
+    <a href="https://www.bumeran.com.ar/empleos-busqueda-junior.html" target="_blank" rel="noopener">Bumeran · junior</a>
+    <a href="https://www.linkedin.com/jobs/search/?keywords=junior%20trainee&location=Argentina" target="_blank" rel="noopener">LinkedIn · AR</a>
+    <a href="https://www.getonbrd.com/empleos-junior" target="_blank" rel="noopener">GetOnBoard · junior</a>
+  </div>
+</section>
+<div class="overlay" id="overlay">
+  <div class="panel">
+    <h2>Programación de actualizaciones</h2>
+    <p class="hint">En este equipo la página es estática: acá se guarda la configuración y se genera la línea de cron
+       que después se instala en el servidor donde se despliegue. Nada corre en segundo plano desde el navegador.</p>
+
+    <div class="frow"><span>Frecuencia</span>
+      <select id="freq">
+        <option value="manual">Manual (solo cuando se pida)</option>
+        <option value="6h">Cada 6 horas</option>
+        <option value="12h">Cada 12 horas</option>
+        <option value="daily">Diaria</option>
+        <option value="weekly">Semanal</option>
+      </select>
+    </div>
+    <div class="frow"><span>Hora</span><input type="time" id="time" value="08:00"></div>
+    <div class="frow"><span>Día</span>
+      <select id="dow">
+        <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
+        <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option>
+        <option value="0">Domingo</option>
+      </select>
+    </div>
+    <div class="frow"><span>Fuentes</span>
+      <div class="srcs" id="srcs"></div>
+    </div>
+    <div class="frow"><span>Histórico</span>
+      <div class="srcs">
+        <label><input type="checkbox" id="hist" checked> Guardar un snapshot por día</label>
+      </div>
+    </div>
+    <div class="frow"><span>Avisos</span>
+      <div class="srcs">
+        <label><input type="checkbox" id="alert" checked> Reportar si una fuente falla</label>
+      </div>
+    </div>
+
+    <div class="out" id="cronOut"></div>
+    <div class="out dim" id="nextOut"></div>
+
+    <div class="actions">
+      <button class="primary" id="saveCfg">Guardar</button>
+      <button id="resetCfg">Restablecer predeterminados</button>
+      <button id="closeCfg">Cerrar</button>
+      <span class="saved" id="savedMsg"></span>
+    </div>
+  </div>
+</div>
+<footer id="foot"></footer>
+
+<script>
+const DATA = {"generatedAt":"2026-10-28T22:33:20.252Z","total":2233,"kept":67,"errors":[],"counts":{"oferta":56,"formacion":11,"alta":67},"jobs":[{"source":"Computrabajo","title":"Analista junior de Facturación, Cobranzas y Proveedores","company":"Estratego Consulting Group","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-junior-de-facturacion-cobranzas-y-proveedores-presencial-caba-en-colegiales-756933090079132061373E686DCF3405#lc=ListOffers-Score4-0","location":"Colegiales, Capital Federal","modality":"presencial","date":"2026-10-28T22:33:04.338Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Trainee informático JR / CABA","company":"Yel","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-trainee-informatico-jr-caba-presencial-en-parque-patricios-4E83E9D23C922D4F61373E686DCF3405#lc=ListOffers-Score4-2","location":"Parque Patricios, Capital Federal","modality":"presencial","date":"2026-10-28T22:33:04.338Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"formacion","confidence":"alta","days":0},{"source":"Computrabajo","title":"Field Support IT Soporte Técnico Informático JR CABA Presencial 9 a 18 hs","company":"Yel","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-field-support-it-soporte-tecnico-informatico-jr-caba-presencial-9-a-18-hs-en-floresta-0CBEC508C579411661373E686DCF3405#lc=ListOffers-Score4-3","location":"Floresta, Capital Federal","modality":"presencial","date":"2026-10-28T22:33:04.338Z","tags":[],"remote":false,"area":"Soporte / IT","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Asistente Jr. de Seguros","company":"Dos Argentina","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-asistente-jr-de-seguros-en-san-miguel-7D474342204D56A961373E686DCF3405#lc=ListOffers-Score0-11","location":"San Miguel, Buenos Aires-GBA","modality":"presencial","date":"2026-10-28T22:33:04.985Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Liquidador Junior de Impuestos","company":"Fortia RH","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-liquidador-junior-de-impuestos-cordoba-capital-en-cordoba-0DA97BA0BC34E80761373E686DCF3405#lc=ListOffers-Score0-12","location":"Córdoba, Córdoba","modality":"presencial","date":"2026-10-28T22:33:04.985Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Administrativo/a Contable Jr. – Empresa de Tecnología","company":"MJ Consultora RH","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-administrativoa-contable-jr-empresa-de-tecnologia-facturacion-cobranzas-y-gestion-administrativa-en-martinez-F0D335644FB1307B61373E686DCF3405#lc=ListOffers-Score0-15","location":"Martínez, Buenos Aires-GBA","modality":"presencial","date":"2026-10-28T22:33:04.986Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Ejecutivo/a Comercial Junior Bilingüe","company":"Link Solution","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ejecutivoa-comercial-junior-bilingue-zona-belgrano-caba-en-belgrano-D01AC14978E9A15F61373E686DCF3405#lc=ListOffers-Score0-19","location":"Belgrano, Capital Federal","modality":"presencial","date":"2026-10-28T22:33:04.986Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Ref. 21550 Analista de Facturación Jr. Puerto Madero, CABA","company":"ADN - Recursos Humanos","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21550-analista-de-facturacion-jr-puerto-madero-caba-puerto-madero-caba-en-puerto-madero-7AF77C9E90F9CCF161373E686DCF3405#lc=ListOffers-Score4-0","location":"Puerto Madero, Capital Federal","modality":"híbrido","date":"2026-10-28T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Ref. 21554: Implementador de Sistemas Junior / Hibrido CABA","company":"ADN - Recursos Humanos","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21554-implementador-de-sistemas-junior-hibrido-caba-en-villa-urquiza-2A5E5144DD4E62E661373E686DCF3405#lc=ListOffers-Score4-1","location":"Villa Urquiza, Capital Federal","modality":"híbrido","date":"2026-10-28T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Analista Jr de Cuentas a Pagar","company":"Gestion Compartida","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-jr-de-cuentas-a-pagar-en-parque-patricios-D0908F29137B99ED61373E686DCF3405#lc=ListOffers-Score4-8","location":"Parque Patricios, Capital Federal","modality":"híbrido","date":"2026-10-28T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":0},{"source":"Computrabajo","title":"Recruiter IT Trainee","company":"C&S informática s.a.","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-recruiter-it-trainee-importante-empresa-de-tecnologia-en-san-nicolas-8D8D778791231C1A61373E686DCF3405#lc=ListOffers-Score4-0","location":"San Nicolás, Capital Federal","modality":"híbrido","date":"2026-10-28T22:33:07.549Z","tags":[],"remote":false,"area":"Soporte / IT","geo":"Argentina","kind":"formacion","confidence":"alta","days":0},{"source":"Computrabajo","title":"Prospectador/a Telefonico/a Jr Comercial B2B / Presencial / Barracas, CABA","company":"ADN - Recursos Humanos","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-prospectadora-telefonicoa-jr-comercial-b2b-presencial-barracas-caba-excluyente-experiencia-b2b-en-barracas-B78869401AE8FC7861373E686DCF3405#lc=ListOffers-Score4-1","location":"Barracas, Capital Federal","modality":"presencial","date":"2026-10-27T22:33:04.338Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":1},{"source":"Computrabajo","title":"Ingeniero Junior o Estudiante Avanzado","company":"COOPERATIVA DE VIVIENDA Y CONSUMO HORIZONTE LTDA.","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ingeniero-junior-o-estudiante-avanzado-en-cordoba-01E862C9436224DB61373E686DCF3405#lc=ListOffers-Score0-14","location":"Córdoba, Córdoba","modality":"presencial","date":"2026-10-27T22:33:04.986Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":1},{"source":"Computrabajo","title":"Ref. 21598 Asistente/administrativo jr / obra social","company":"ADN - Recursos Humanos","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21598-asistenteadministrativo-jr-obra-social-caba-centro-en-san-nicolas-772712D7B839456961373E686DCF3405#lc=ListOffers-Score0-16","location":"San Nicolás, Capital Federal","modality":"presencial","date":"2026-10-27T22:33:04.986Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":1},{"source":"Computrabajo","title":"Analista de Contabilidad Jr.","company":"","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-de-contabilidad-jr-en-quilmes-F7C0137EDA2EB34C61373E686DCF3405#lc=ListOffers-Score0-17","location":"Berazategui, Buenos Aires-GBA","modality":"presencial","date":"2026-10-27T22:33:04.986Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":1},{"source":"Computrabajo","title":"Comercio Exterior Jr. (Part Time)","company":"ManpowerGroup","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-comercio-exterior-jr-part-time-en-retiro-49C36F1584E0F91E61373E686DCF3405#lc=ListOffers-Score4-4","location":"Retiro, Capital Federal","modality":"híbrido","date":"2026-10-27T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":1},{"source":"Computrabajo","title":"Ref. 21550: Analista de Facturación Jr. / Híbrido Puerto Madero CABA","company":"ADN - Recursos Humanos","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ref-21550-analista-de-facturacion-jr-hibrido-puerto-madero-caba-en-puerto-madero-6C69EB9CB72175FC61373E686DCF3405#lc=ListOffers-Score4-9","location":"Puerto Madero, Capital Federal","modality":"híbrido","date":"2026-10-27T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":1},{"source":"Computrabajo","title":"38oes Analista de facturación jr / Híbrido / Caba","company":"Cona Consultores SRL","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-38oes-analista-de-facturacion-jr-hibrido-caba-en-puerto-madero-D7166E1FC508043061373E686DCF3405#lc=ListOffers-Score4-12","location":"Puerto Madero, Capital Federal","modality":"híbrido","date":"2026-10-27T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":1},{"source":"Computrabajo","title":"Ingeniero junior/Tecnico","company":"ELECTROMECANICO SIEM S.A.","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-ingeniero-juniortecnico-presencial-zona-maipu-en-maipu-FC4B5E9CA5A5ED3761373E686DCF3405#lc=ListOffers-Score4-5","location":"Maipú, Mendoza","modality":"presencial","date":"2026-10-26T22:33:04.338Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":2},{"source":"Computrabajo","title":"Asistente Comercial B2B Jr. / Presencial / Barracas (CABA)","company":"ADN - Recursos Humanos","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-asistente-comercial-b2b-jr-presencial-barracas-caba-prospeccion-telefonica-b2b-en-barracas-C6F755E4F39F854861373E686DCF3405#lc=ListOffers-Score4-6","location":"Barracas, Capital Federal","modality":"presencial","date":"2026-10-26T22:33:04.338Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":2},{"source":"Computrabajo","title":"1263CC Trainees Recursos Humanos","company":"Cona Consultores SRL","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-1263cc-trainees-recursos-humanos--mitad-carrera-aprobada-6-hs-presenciales-en-belgrano-32942A2830CE018561373E686DCF3405#lc=ListOffers-Score4-1","location":"Belgrano, Capital Federal","modality":"presencial","date":"2026-10-26T22:33:04.985Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"formacion","confidence":"alta","days":2},{"source":"Computrabajo","title":"Comercial Junior","company":"OENOLAB","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-comercial-junior-en-las-heras-1B8728810E51E62B61373E686DCF3405#lc=ListOffers-Score4-13","location":"Las Heras, Mendoza","modality":"híbrido","date":"2026-10-26T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":2},{"source":"Computrabajo","title":"Auditor Externo (Junior)","company":"hiNext","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-auditor-externo-junior-en-tigre-185649E166E6B07B61373E686DCF3405#lc=ListOffers-Score4-14","location":"Tigre, Buenos Aires-GBA","modality":"híbrido","date":"2026-10-26T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":2},{"source":"Computrabajo","title":"Analista Jr. Liquidación de Sueldos","company":"Gestion Compartida","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-jr-liquidacion-de-sueldos-en-parque-patricios-B3D9C30672E17A3661373E686DCF3405#lc=ListOffers-Score4-15","location":"Parque Patricios, Capital Federal","modality":"híbrido","date":"2026-10-26T22:33:06.881Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":2},{"source":"Computrabajo","title":"Auxiliar de logistica Jr. Ssr","company":"Focus - Gestión Integral de Rrhh","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-auxiliar-de-logistica-jr-ssr--estudiante-de-logistica-presencial-cordoba-en-cordoba-6B5A795CB49CBD7A61373E686DCF3405#lc=ListOffers-Score4-7","location":"Córdoba, Córdoba","modality":"presencial","date":"2026-10-25T22:33:04.338Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":3},{"source":"Computrabajo","title":"Trainee informático JR / Vicente Lopez / Olivos / Zona norte","company":"Yel","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-trainee-informatico-jr-vicente-lopez-olivos-zona-norte-presencial-en-parque-patricios-C317C7A1CEBA8DAB61373E686DCF3405#lc=ListOffers-Score4-8","location":"Parque Patricios, Capital Federal","modality":"presencial","date":"2026-10-25T22:33:04.338Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"formacion","confidence":"alta","days":3},{"source":"Computrabajo","title":"Analista de Comercio Exterior Junior","company":"","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-de-comercio-exterior-junior-puerto-madero-presencial-en-puerto-madero-4FDF491000EF9CA961373E686DCF3405#lc=ListOffers-Score4-9","location":"Puerto Madero, Capital Federal","modality":"presencial","date":"2026-10-25T22:33:04.339Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":3},{"source":"Computrabajo","title":"Analista Inmobiliario Jr.","company":"","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-inmobiliario-jr-en-monserrat-6B7E93203639DA0661373E686DCF3405#lc=ListOffers-Score3-0","location":"Monserrat, Capital Federal","modality":"híbrido","date":"2026-10-25T22:33:08.158Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":3},{"source":"Computrabajo","title":"Profesional en Mineria para Comercial Tecnico Jr","company":"Adecco Argentina S.A.","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-profesional-en-mineria-para-comercial-tecnico-jr-en-mendoza-FD93C1CBEDBCFB4361373E686DCF3405#lc=ListOffers-Score4-0","location":"Mendoza, Mendoza","modality":"remoto","date":"2026-10-25T22:33:09.471Z","tags":[],"remote":true,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":3},{"source":"Computrabajo","title":"Analista de Comercio Exterior Jr. San Justo (Presencial)","company":"ManpowerGroup","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-de-comercio-exterior-jr-san-justo-presencial-en-retiro-FE2A4393627A610161373E686DCF3405#lc=ListOffers-Score4-12","location":"Retiro, Capital Federal","modality":"presencial","date":"2026-10-23T22:33:04.339Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":5},{"source":"Computrabajo","title":"Administrativo trainee","company":"JPH Lions","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-administrativo-trainee-en-villa-martelli-D75300F8E50A0E5661373E686DCF3405#lc=ListOffers-Score3-6","location":"Villa Martelli, Buenos Aires-GBA","modality":"presencial","date":"2026-10-23T22:33:04.985Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"formacion","confidence":"alta","days":5},{"source":"Computrabajo","title":"Perfil Junior","company":"B&B Consultores","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-perfil-junior-en-rosario-3F03D063EB4C5F3561373E686DCF3405#lc=ListOffers-Score4-1","location":"Rosario, Santa Fe","modality":"remoto","date":"2026-10-22T22:33:09.471Z","tags":[],"remote":true,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":6},{"source":"Computrabajo","title":"Consultor SAP Basis (inglés intermedio/avanzado) Jr","company":"C&S informática s.a.","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-consultor-sap-basis-ingles-intermedioavanzado-jr-en-san-nicolas-0E02844A11FDF51A61373E686DCF3405#lc=ListOffers-Score4-4","location":"San Nicolás, Capital Federal","modality":"remoto","date":"2026-10-22T22:33:09.471Z","tags":[],"remote":true,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":6},{"source":"Computrabajo","title":"Recruiter IT Trainee con Inglés avanzado","company":"C&S informática s.a.","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-recruiter-it-trainee-con-ingles-avanzado-importante-empresa-de-tecnologia-en-san-nicolas-9679F6053CF835F261373E686DCF3405#lc=ListOffers-Score4-1","location":"San Nicolás, Capital Federal","modality":"híbrido","date":"2026-10-21T22:33:07.549Z","tags":[],"remote":false,"area":"Soporte / IT","geo":"Argentina","kind":"formacion","confidence":"alta","days":7},{"source":"Computrabajo","title":"Analista contable junior","company":"Bridge Consulting","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-analista-contable-junior-presencial-en-belgrano-7A275360DAC1AE1861373E686DCF3405#lc=ListOffers-Score4-17","location":"Belgrano, Capital Federal","modality":"presencial","date":"2026-09-28T22:33:04.339Z","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":30},{"source":"Computrabajo","title":"auxiliar de contador Jr Para Estudio contable","company":"Rocchetti & Asociados","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-auxiliar-de-contador-jr-para-estudio-contable-presencial-en-retiro-494E382D36E1986A61373E686DCF3405#lc=ListOffers-Score4-15","location":"Retiro, Capital Federal","modality":"presencial","date":"","tags":[],"remote":false,"area":"Otros","geo":"Argentina","kind":"oferta","confidence":"alta","days":null},{"source":"Computrabajo","title":"Asistente de Marketing Digital Jr","company":"TOP DIGITAL TRAFFIC LLC","url":"https://ar.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-asistente-de-marketing-digital-jr-remoto-part-time-en-palermo-7B641EAFE1CF708661373E686DCF3405#lc=ListOffers-Score4-7","location":"Palermo, Capital Federal","modality":"remoto","date":"","tags":[],"remote":true,"area":"Marketing","geo":"Argentina","kind":"oferta","confidence":"alta","days":null},{"source":"Himalayas","title":"Junior Video Editor","company":"HIGHSCALE","modality":"remoto","url":"https://himalayas.app/companies/highscale/jobs/junior-video-editor-5488587163?utm_source=api","location":"Colombia","date":"2026-10-28T20:52:42.000Z","tags":["Video-Editor","Junior-Video-Editor","Social-Media-Video-Editor","Post-Production-Editor","Commercial-Video-Editing","Assistant-Video-Editor","Video-Editing-Intern","Part-Time-Video-Editor","Junior-Editor"],"remote":true,"area":"Otros","geo":"LATAM","kind":"oferta","confidence":"alta","days":0},{"source":"GetOnBoard","title":"Trainee Account Executive (Ae)","company":"Zerviz Technologies","companyId":6167,"url":"https://www.getonbrd.com/jobs/practicante-ejecutivo-a-comercial-zerviz-technologies-santiago","location":"Chile","modality":"híbrido","date":"2026-10-28T12:42:26.000Z","tags":[],"remote":false,"area":"Otros","geo":"LATAM","kind":"formacion","confidence":"alta","days":0},{"source":"GetOnBoard","title":"Junior Back-end Engineer Santiago","company":"Krunchbox","companyId":16752,"url":"https://www.getonbrd.com/jobs/junior-backend-engineer-santiago-krunchbox-santiago","location":"Chile","modality":"híbrido","date":"2026-10-27T22:37:14.000Z","tags":[],"remote":false,"area":"Desarrollo","geo":"LATAM","kind":"oferta","confidence":"alta","days":1},{"source":"GetOnBoard","title":"Analista de Negocios Junior – Retail e IA (LLM)","company":"BC Tecnología","companyId":9458,"url":"https://www.getonbrd.com/jobs/analista-de-negocios-junior-retail-e-inteligencia-artifici-bc-tecnologia-santiago","location":"Chile","modality":"híbrido","date":"2026-10-21T02:41:26.000Z","tags":[],"remote":false,"area":"Otros","geo":"LATAM","kind":"oferta","confidence":"alta","days":8},{"source":"GetOnBoard","title":"Junior Integrations Developer","company":"Inversiones Vertice Limitada","companyId":16565,"url":"https://www.getonbrd.com/jobs/junior-integrations-developer-inversiones-vertice-limitada-santiago","location":"Chile","modality":"presencial","date":"2026-10-19T21:02:48.000Z","tags":[],"remote":false,"area":"Desarrollo","geo":"LATAM","kind":"oferta","confidence":"alta","days":9},{"source":"GetOnBoard","title":"Analista de Soporte SAP Basis Junior","company":"Factor IT","companyId":15558,"url":"https://www.getonbrd.com/jobs/analista-de-soporte-sap-basis-junior-factor-it-medellin","location":"Colombia","modality":"híbrido","date":"2026-10-16T17:23:15.000Z","tags":[],"remote":false,"area":"Soporte / IT","geo":"LATAM","kind":"oferta","confidence":"alta","days":12},{"source":"GetOnBoard","title":"Ingeniero Junior en Inteligencia Artificial","company":"BICE VIDA","companyId":7178,"url":"https://www.getonbrd.com/jobs/ingeniero-junior-en-inteligencia-artificial-bice-vida-santiago-98ad","location":"Chile","modality":"híbrido","date":"2026-10-14T15:27:10.000Z","tags":[],"remote":false,"area":"Datos","geo":"LATAM","kind":"oferta","confidence":"alta","days":14},{"source":"GetOnBoard","title":"Data Scientist Junior","company":"Unholster","companyId":451,"url":"https://www.getonbrd.com/jobs/data-scientist-unholster-santiago-2697","location":"Chile","modality":"presencial","date":"2026-10-14T18:54:14.000Z","tags":[],"remote":false,"area":"Datos","geo":"LATAM","kind":"oferta","confidence":"alta","days":14},{"source":"GetOnBoard","title":"Ingeniero Trainee Tecnologías y Datos","company":"Agrosuper","companyId":11871,"url":"https://www.getonbrd.com/jobs/ingeniero-trainee-tecnologias-y-datos-agrosuper-rancagua","location":"Chile","modality":"híbrido","date":"2026-10-07T20:27:33.000Z","tags":[],"remote":false,"area":"Datos","geo":"LATAM","kind":"formacion","confidence":"alta","days":21},{"source":"GetOnBoard","title":"Consultor/a Salesforce Junior","company":"Lisit","companyId":8900,"url":"https://www.getonbrd.com/jobs/consultor-a-salesforce-junior-lisit-santiago-ebf2","location":"Chile","modality":"híbrido","date":"2026-10-06T23:54:21.000Z","tags":[],"remote":false,"area":"Otros","geo":"LATAM","kind":"oferta","confidence":"alta","days":22},{"source":"GetOnBoard","title":"Ingeniero Trainee Industrial","company":"Agrosuper","companyId":11871,"url":"https://www.getonbrd.com/jobs/ingeniero-trainee-industrial-agrosuper-rancagua-1685","location":"Chile","modality":"presencial","date":"2026-10-01T17:02:27.000Z","tags":[],"remote":false,"area":"Otros","geo":"LATAM","kind":"formacion","confidence":"alta","days":27},{"source":"GetOnBoard","title":"Asistente de Gerencia Junior / Portugués e Inglés","company":"OMNIX AI Corp","companyId":12232,"url":"https://www.getonbrd.com/jobs/asistente-de-gerencia-junior-portugues-e-ingles-omnix-ai-corp-santiago","location":"Chile","modality":"híbrido","date":"2026-09-28T00:48:02.000Z","tags":[],"remote":false,"area":"Otros","geo":"LATAM","kind":"oferta","confidence":"alta","days":31},{"source":"GetOnBoard","title":"Ejecutivo de Onboarding Junior","company":"AgendaPro","companyId":2696,"url":"https://www.getonbrd.com/jobs/ejecutivo-de-onboarding-junior-agendapro-ciudad-de-mexico","location":"Mexico","modality":"presencial","date":"2026-09-20T13:12:41.000Z","tags":[],"remote":false,"area":"Otros","geo":"LATAM","kind":"oferta","confidence":"alta","days":38},{"source":"GetOnBoard","title":"Business Analyst Junior / Analista de Procesos","company":"BC Tecnología","companyId":9458,"url":"https://www.getonbrd.com/jobs/business-analyst-junior-analista-de-procesos-bc-tecnologia-santiago","location":"Chile","modality":"presencial","date":"2026-09-16T02:20:04.000Z","tags":[],"remote":false,"area":"Producto","geo":"LATAM","kind":"oferta","confidence":"alta","days":43},{"source":"GetOnBoard","title":"Paid Media Junior (E-commerce)","company":"DSAC Chile","companyId":18951,"url":"https://www.getonbrd.com/jobs/paid-media-junior-ecommerce-dsac-chile-santiago","location":"Chile","modality":"híbrido","date":"2026-09-07T17:44:53.000Z","tags":[],"remote":false,"area":"Otros","geo":"LATAM","kind":"oferta","confidence":"alta","days":51},{"source":"VacantesDigitales","title":"Talent Sourcer — Híbrido - Perú — Tecnología - Sourcing, Reclutamiento","company":"Coforge","url":"https://www.linkedin.com/feed/update/urn:li:activity:7499210015233425408","location":"PE","modality":"híbrido","date":"2026-09-02T03:11:36.656Z","tags":["talent sourcer","sourcing","reclutamiento","talent acquisition","peru","Coforge","EmpleosPerú","EstamosContratando","Hiring","Recruitment","RecursosHumanos","TalentAcquisition","TalentSourcer"],"remote":false,"geoFixed":"LATAM","juniorOk":true,"area":"Otros","geo":"LATAM","kind":"oferta","confidence":"alta","days":57},{"source":"GetOnBoard","title":"Accounting Internship","company":"AgendaPro","companyId":2696,"url":"https://www.getonbrd.com/jobs/finance-intern-agendapro-santiago","location":"Chile","modality":"presencial","date":"2026-08-11T17:03:45.000Z","tags":[],"remote":false,"area":"Finanzas / Admin","geo":"LATAM","kind":"formacion","confidence":"alta","days":78},{"source":"GetOnBoard","title":"Ingeniero DevOps Junior","company":"Transvip","companyId":15067,"url":"https://www.getonbrd.com/jobs/ingeniero-devops-junior-transvip-santiago","location":"Chile","modality":"híbrido","date":"2026-08-10T19:40:03.000Z","tags":[],"remote":false,"area":"Desarrollo","geo":"LATAM","kind":"oferta","confidence":"alta","days":79},{"source":"VacantesDigitales","title":"Desarrollador Móvil Junior Flutter — Presencial - México — Desarrollo de Software - Flutter, Kotlin","company":"","url":"https://www.linkedin.com/feed/update/urn:li:activity:7487947789918720000","location":"MX","modality":"presencial","date":"2026-08-10T17:13:27.328Z","tags":["desarrollador móvil","mobile developer","Flutter","Kotlin","junior"],"remote":false,"geoFixed":"LATAM","juniorOk":true,"area":"Desarrollo","geo":"LATAM","kind":"oferta","confidence":"alta","days":79},{"source":"VacantesDigitales","title":"Desarrollador Fullstack Junior — Presencial - CDMX — Startup IA - Python, FastAPI, React, LangChain","company":"","url":"https://www.linkedin.com/feed/update/urn:li:activity:7490816122812903424","location":"Ciudad de México","modality":"presencial","date":"2026-08-05T17:23:17.048Z","tags":["fullstack developer","desarrollador fullstack","junior","python","aws","ia","ai","generative ai","ia generativa","langchain","llm","claude","gpt","vue","react","angular","websockets","streaming","tiempo real"],"remote":false,"geoFixed":"LATAM","juniorOk":true,"area":"Datos","geo":"LATAM","kind":"oferta","confidence":"alta","days":84},{"source":"VacantesDigitales","title":"Back-end Engineer Junior — Híbrido - Santiago — Startup - Node.js, APIs","company":"Krunchbox","url":"https://www.linkedin.com/feed/update/urn:li:activity:7490488869218426880","location":"Santiago","modality":"híbrido","date":"2026-08-04T19:29:21.489Z","tags":["backend engineer","node.js","api","junior","desarrollador backend","HayPega","OfertasLaborales"],"remote":false,"geoFixed":"LATAM","juniorOk":true,"area":"Desarrollo","geo":"LATAM","kind":"oferta","confidence":"alta","days":85},{"source":"WWR","title":"Communications Intern","company":"Keeper Security","modality":"remoto","url":"https://weworkremotely.com/remote-jobs/keeper-security-communications-intern","location":"Anywhere in the World","date":"Sun, 25 Oct 2026 07:31:02 +0000","tags":["DevOps and Sysadmin"],"area":"Desarrollo","geo":"Global / remoto","kind":"oferta","confidence":"alta","days":4},{"source":"WWR","title":"CRM Retention Junior","company":"Bullfinch Recruitment","modality":"remoto","url":"https://weworkremotely.com/remote-jobs/bullfinch-recruitment-crm-retention-junior","location":"Anywhere in the World","date":"Thu, 22 Oct 2026 18:08:21 +0000","tags":["Customer Support"],"area":"Soporte / IT","geo":"Global / remoto","kind":"oferta","confidence":"alta","days":6},{"source":"GetOnBoard","title":"Aprendiz de Inteligencia Artificial Contrato Sena","company":"Factor IT","companyId":15558,"url":"https://www.getonbrd.com/jobs/ai-trainee-aprendiz-de-inteligencia-artificial-factor-it-remote","location":"Remote","modality":"remoto","date":"2026-10-19T20:53:42.000Z","tags":[],"remote":false,"area":"Datos","geo":"Global / remoto","kind":"formacion","confidence":"alta","days":9},{"source":"RemoteOK","title":"Graduate Transport Planner","company":"Curtins","url":"https://remoteOK.com/remote-jobs/remote-graduate-transport-planner-curtins-1137542","modality":"remoto","location":"Worldwide","date":"2026-10-17T08:00:50+00:00","tags":["hr","education","consulting","technical","customer support","marketing","travel","medical","engineer"],"salary":"","area":"Desarrollo","geo":"Global / remoto","kind":"oferta","confidence":"alta","days":12},{"source":"RemoteOK","title":"Junior Sales Development Representative IT Industry","company":"Huzzle","url":"https://remoteOK.com/remote-jobs/remote-junior-sales-development-representative-it-industry-huzzle-1137480","modality":"remoto","location":"Worldwide","date":"2026-10-10T00:00:17+00:00","tags":["saas","technical","marketing","finance","c","cloud","microsoft","senior","junior","ops","sales","ecommerce","full time"],"salary":"","area":"Marketing","geo":"Global / remoto","kind":"oferta","confidence":"alta","days":19},{"source":"WWR","title":"Web Developer (Fresh graduate welcome, WFH policy, on-job-training)","company":"HR Plus","modality":"remoto","url":"https://weworkremotely.com/remote-jobs/hr-plus-web-developer-fresh-graduate-welcome-wfh-policy-on-job-training","location":"Anywhere in the World","date":"Tue, 29 Sep 2026 19:13:52 +0000","tags":["Front-End Programming"],"area":"Desarrollo","geo":"Global / remoto","kind":"oferta","confidence":"alta","days":29},{"source":"GetOnBoard","title":"Junior IT Support Technician","company":"Bitmax Technologies, LLC","companyId":20351,"url":"https://www.getonbrd.com/jobs/junior-it-support-technician-bitmax-technologies-llc-remote","location":"Remote","modality":"remoto","date":"2026-08-22T22:07:04.000Z","tags":[],"remote":true,"area":"Soporte / IT","geo":"Global / remoto","kind":"oferta","confidence":"alta","days":67},{"source":"RemoteOK","title":"QA Tester Entry Level","company":"Ace IT Careers","url":"https://remoteOK.com/remote-jobs/remote-qa-tester-entry-level-ace-it-careers-1136701","modality":"remoto","location":"Remote","date":"2026-08-15T00:00:25+00:00","tags":["testing","dev","analyst","quality assurance","digital nomad"],"salary":"","area":"Desarrollo","geo":"Global / remoto","kind":"oferta","confidence":"alta","days":75},{"source":"VacantesDigitales","title":"Desarrollador Frontend React.js — Remoto - India — Startup Tech - React.js, Next.js, Tailwind CSS","company":"Tech Cloud System","url":"https://www.linkedin.com/feed/update/urn:li:activity:7488496266700709889","location":"LATAM","modality":"remoto","date":"2026-07-31T03:26:24.481Z","tags":["frontend developer","react","next.js","javascript","desarrollador frontend","web developer","Bootstrap","CSS","CareerOpportunity","DeveloperJobs","FrontendDeveloper","HTML","Hiring","HiringNow","JavaScript","NextJS","ReactDeveloper","ReactJS","RemoteJobs","TailwindCSS","TechJobs","WebDevelopment","remote"],"remote":true,"geoFixed":"Global / remoto","juniorOk":true,"area":"Desarrollo","geo":"Global / remoto","kind":"oferta","confidence":"alta","days":90}]};
+const state = { q:'', kind:'todas', area:'', geo:'', modality:'' };
+
+const sub = document.getElementById('sub');
+const d = new Date(DATA.generatedAt);
+sub.textContent = `Revisadas ${DATA.total} ofertas de fuentes públicas · ${DATA.kept} pasaron el filtro junior/trainee · generado ${d.toLocaleString('es-AR')} · los links abren la oferta original`;
+
+document.getElementById('stats').innerHTML = [
+  ['Total', DATA.kept], ['Ofertas', DATA.counts.oferta], ['Formación', DATA.counts.formacion],
+  ['Alta confianza', DATA.counts.alta],
+].map(([k,v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('');
+
+const areas = [...new Set(DATA.jobs.map(j => j.area))].sort();
+document.getElementById('areas').innerHTML = areas.map(a =>
+  `<span class="chip" data-k="area" data-v="${a}">${a}</span>`).join(' ');
+
+document.getElementById('mods').innerHTML = ['remoto','híbrido','presencial'].map(m =>
+  `<span class="chip" data-k="modality" data-v="${m}">${m}</span>`).join(' ');
+
+const geos = ['Argentina','LATAM','Global / remoto'];
+document.getElementById('geos').innerHTML = geos.map(g =>
+  `<span class="chip geo" data-k="geo" data-v="${g}">${g}</span>`).join(' ');
+
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+  const k = c.dataset.k, v = c.dataset.v;
+  if (k === 'kind') {
+    state.kind = (state.kind === v) ? 'todas' : v;
+    document.querySelectorAll('[data-k=kind]').forEach(x => x.classList.toggle('on', x.dataset.v === state.kind));
+    if (state.kind === 'todas') document.querySelector('[data-k=kind][data-v=todas]').classList.add('on');
+  } else {
+    state[k] = (state[k] === v) ? '' : v;
+    document.querySelectorAll(`[data-k=${k}]`).forEach(x => x.classList.toggle('on', x.dataset.v === state[k]));
+  }
+  render();
+}));
+
+document.getElementById('q').addEventListener('input', e => { state.q = e.target.value.toLowerCase().trim(); render(); });
+
+function render() {
+  const out = DATA.jobs.filter(j => {
+    if (state.kind !== 'todas' && j.kind !== state.kind) return false;
+    if (state.area && j.area !== state.area) return false;
+    if (state.geo && j.geo !== state.geo) return false;
+    if (state.modality && j.modality !== state.modality) return false;
+    if (state.q) {
+      const hay = `${j.title} ${j.company} ${j.tags.join(' ')} ${j.location}`.toLowerCase();
+      if (!hay.includes(state.q)) return false;
+    }
+    return true;
+  });
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = out.length ? out.map(j => `
+    <article class="card">
+      <h2><a href="${j.url}" target="_blank" rel="noopener">${esc(j.title)}</a></h2>
+      <div class="co">${esc(j.company || '—')}</div>
+      <div class="badges">
+        ${j.kind === 'formacion' ? '<span class="b formacion">formación</span>' : ''}
+        <span class="b area">${esc(j.area)}</span>
+        <span class="b geo">${esc(j.geo)}</span>
+        <span class="b mod ${j.modality === 'presencial' ? 'mod-p' : j.modality === 'híbrido' ? 'mod-h' : ''}">${esc(j.modality)}</span>
+        ${j.days !== null && j.days <= 7 ? '<span class="b nuevo">nueva</span>' : ''}
+        ${j.confidence === 'media' ? '<span class="b dudoso">revisar</span>' : ''}
+      </div>
+      <div class="meta">
+        <span>${esc(j.source)} · ${esc(j.location || 'sin dato')}${j.days !== null ? ` · hace ${j.days} d` : ''}</span>
+        <a href="${j.url}" target="_blank" rel="noopener">Ver →</a>
+      </div>
+    </article>`).join('') : '<div class="empty">Nada con esos filtros.</div>';
+}
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+render();
+
+// ---------- pantalla de programación ----------
+const SRC_ALL = [...new Set(DATA.jobs.map(j => j.source))].sort();
+const CFG_KEY = 'radar.schedule.v1';
+const DEFAULTS = {
+  freq: 'daily', time: '08:00', dow: '1',
+  sources: Object.fromEntries(SRC_ALL.map(s => [s, true])),
+  hist: true, alert: true,
+};
+const loadCfg = () => {
+  try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(CFG_KEY) || '{}') }; }
+  catch { return { ...DEFAULTS }; }
+};
+let cfg = loadCfg();
+
+const $ = (id) => document.getElementById(id);
+const pad = (n) => String(n).padStart(2, '0');
+
+function renderSources() {
+  $('srcs').innerHTML = SRC_ALL.map(s =>
+    `<label><input type="checkbox" data-src="${s}" ${cfg.sources[s] !== false ? 'checked' : ''}> ${s}</label>`).join('');
+  $('srcs').querySelectorAll('input[data-src]').forEach(el => el.addEventListener('change', () => {
+    cfg.sources[el.dataset.src] = el.checked; drawSchedule();
+  }));
+}
+function drawForm() {
+  $('freq').value = cfg.freq;
+  $('time').value = cfg.time;
+  $('dow').value = cfg.dow;
+  $('hist').checked = !!cfg.hist;
+  $('alert').checked = !!cfg.alert;
+  $('dow').disabled = cfg.freq !== 'weekly';
+  $('time').disabled = cfg.freq === 'manual' || cfg.freq === '6h' || cfg.freq === '12h';
+  renderSources();
+  drawSchedule();
+}
+function cronOf(c) {
+  const [hh, mm] = (c.time || '08:00').split(':').map(Number);
+  if (c.freq === 'manual') return null;
+  if (c.freq === '6h') return '0 */6 * * *';
+  if (c.freq === '12h') return '0 */12 * * *';
+  if (c.freq === 'weekly') return `${mm || 0} ${hh} * * ${c.dow}`;
+  return `${mm || 0} ${hh} * * *`;
+}
+function nextRuns(c, n = 3) {
+  const out = [];
+  const [hh, mm] = (c.time || '08:00').split(':').map(Number);
+  let d = new Date();
+  if (c.freq === 'manual') return out;
+  if (c.freq === '6h' || c.freq === '12h') {
+    const step = c.freq === '6h' ? 6 : 12;
+    let t = new Date(d); t.setMinutes(0, 0, 0);
+    t.setHours(Math.ceil((t.getHours() + (t.getMinutes() > 0 ? 1 : 0)) / step) * step);
+    for (let i = 0; i < n; i++) { out.push(new Date(t)); t = new Date(t.getTime() + step * 3600e3); }
+    return out;
+  }
+  let t = new Date(d); t.setHours(hh, mm, 0, 0);
+  if (t <= d) t.setDate(t.getDate() + 1);
+  if (c.freq === 'weekly') { while (t.getDay() !== Number(c.dow)) t.setDate(t.getDate() + 1); }
+  for (let i = 0; i < n; i++) {
+    out.push(new Date(t));
+    t = new Date(t); t.setDate(t.getDate() + (c.freq === 'weekly' ? 7 : 1));
+  }
+  return out;
+}
+function drawSchedule() {
+  const cron = cronOf(cfg);
+  const act = Object.values(cfg.sources).filter(Boolean).length;
+  const cmd = 'cd /srv/job-radar && /usr/bin/node fetch.mjs >> cron.log 2>&1';
+  if (!cron) {
+    $('cronOut').textContent = 'Sin automatización: se ejecuta solo a pedido.\n\nPara el servidor no hace falta instalar nada.';
+  } else {
+    $('cronOut').textContent =
+      `# crontab -e   (en el servidor)\n${cron} ${cmd}\n\n` +
+      `# fuente: ${act}/${SRC_ALL.length} fuentes · histórico ${cfg.hist ? 'sí' : 'no'} · avisos de falla ${cfg.alert ? 'sí' : 'no'}`;
+  }
+  const runs = nextRuns(cfg);
+  $('nextOut').textContent = runs.length
+    ? 'próximas ejecuciones: ' + runs.map(d => d.toLocaleString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })).join('   ·   ')
+    : 'próximas ejecuciones: —';
+}
+$('openSettings').addEventListener('click', () => { $('overlay').classList.add('on'); drawForm(); });
+$('closeCfg').addEventListener('click', () => $('overlay').classList.remove('on'));
+$('overlay').addEventListener('click', (e) => { if (e.target.id === 'overlay') $('overlay').classList.remove('on'); });
+['freq', 'time', 'dow', 'hist', 'alert'].forEach(id =>
+  $(id).addEventListener('change', () => {
+    cfg.freq = $('freq').value; cfg.time = $('time').value; cfg.dow = $('dow').value;
+    cfg.hist = $('hist').checked; cfg.alert = $('alert').checked;
+    drawForm();
+  }));
+$('saveCfg').addEventListener('click', () => {
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  $('savedMsg').textContent = 'guardado ✓';
+  setTimeout(() => { $('savedMsg').textContent = ''; }, 2000);
+});
+$('resetCfg').addEventListener('click', () => {
+  cfg = { ...DEFAULTS, sources: { ...DEFAULTS.sources } };
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  drawForm();
+  $('savedMsg').textContent = 'predeterminados ✓';
+  setTimeout(() => { $('savedMsg').textContent = ''; }, 2000);
+});
+drawForm();
+
+document.getElementById('foot').textContent = DATA.errors?.length
+  ? 'Fuentes con problemas: ' + DATA.errors.join(' · ')
+  : 'Todas las fuentes respondieron.';
+</script>
+</body>
+</html>

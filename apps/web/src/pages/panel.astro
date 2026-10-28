@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getStats } from '../lib/stats';
+
+const user = Astro.locals.user!;
+const s = getStats();
+const demo = Astro.locals.configured === false;
+const nombre = (user.user_metadata?.name as string | undefined) || user.email?.split('@')[0] || 'hola';
+---
+<Layout title="Panel — Radar Junior">
+  <main>
+    <div class="wrap">
+      <div class="panel-head">
+        <div>
+          <h1>Hola, {nombre}</h1>
+          <div class="who">{user.email}</div>
+        </div>
+        <a class="btn primary" href="/busquedas" style="margin-left:auto">Ver ofertas</a>
+        <form method="post" action="/api/auth/logout">
+          <button class="btn ghost" type="submit">Salir</button>
+        </form>
+      </div>
+
+      {demo && (
+        <div class="alert warn">
+          Sesión de demostración: Supabase no está configurado. Cuando pegues las claves en <code>.env</code>,
+          este panel pasa a leer tu usuario real.
+        </div>
+      )}
+
+      <div class="stats" style="margin-top:0">
+        <div><b>{s.total}</b><span>ofertas abiertas</span></div>
+        <div><b>{s.ar}</b><span>en Argentina</span></div>
+        <div><b>{s.companies}</b><span>empresas</span></div>
+        <div><b>{s.modality['híbrido'] ?? 0}</b><span>híbridas</span></div>
+      </div>
+
+      <section class="block" style="border-top:0">
+        <h2 style="font-size:20px">Búsquedas guardadas</h2>
+        <p class="sub" style="margin-bottom:18px">Todavía no hay ninguna. Cuando el scraper escriba en Postgres, acá aparecen tus alertas.</p>
+        <div class="empty">
+          <strong>Nada guardado todavía</strong>
+          Creá una búsqueda para recibir avisos cuando aparezcan ofertas nuevas que encajen.
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>

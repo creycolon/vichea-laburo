@@ -1,0 +1,153 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getJobs } from '../lib/jobs';
+import { createSupabase } from '../lib/supabase';
+
+const user = Astro.locals.user!;
+const jobs = getJobs();
+const supabase = createSupabase(Astro.cookies);
+
+// Búsquedas guardadas: de Supabase si está configurado, si no quedan vacías (el
+// guardado en modo demo vive en localStorage del navegador).
+let guardadas: { id: string; name: string; filters: any }[] = [];
+if (supabase) {
+  const { data } = await supabase.from('saved_searches').select('id, name, filters').order('created_at', { ascending: false });
+  guardadas = data ?? [];
+}
+
+const geos = [...new Set(jobs.map((j) => j.geo))];
+const mods = [...new Set(jobs.map((j) => j.modality))];
+const areas = [...new Set(jobs.map((j) => j.area))].sort();
+const ok = Astro.url.searchParams.get('ok');
+---
+
+<Layout title="Búsquedas — Radar Junior">
+  <main>
+    <div class="wrap">
+      <div class="panel-head">
+        <div>
+          <h1>Ofertas</h1>
+          <div class="who">{jobs.length} avisos junior/trainee · {user.email}</div>
+        </div>
+        <form method="post" action="/api/auth/logout" style="margin-left:auto">
+          <button class="btn ghost" type="submit">Salir</button>
+        </form>
+      </div>
+
+      {ok && <div class="alert ok">Búsqueda guardada.</div>}
+
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Puesto, empresa, tecnología…" />
+        <span class="chip on" data-k="geo" data-v="">Todas</span>
+        {geos.map((g) => <span class="chip" data-k="geo" data-v={g}>{g}</span>)}
+        <span style="width:100%"></span>
+        <span class="chip on" data-k="modality" data-v="">Toda modalidad</span>
+        {mods.map((m) => <span class="chip" data-k="modality" data-v={m}>{m}</span>)}
+        <span class="count" id="count"></span>
+      </div>
+
+      <div class="toolbar">
+        <span class="chip on" data-k="area" data-v="">Toda área</span>
+        {areas.map((a) => <span class="chip" data-k="area" data-v={a}>{a}</span>)}
+        <button class="btn" id="saveBtn" style="margin-left:auto">Guardar esta búsqueda</button>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Puesto</th><th>Empresa</th><th>Ubicación</th><th>Modalidad</th><th>Área</th><th>Fuente</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+
+      <section class="block" id="guardadas">
+        <h2 style="font-size:19px">Búsquedas guardadas</h2>
+        <p class="sub" style="margin-bottom:14px" id="guardadasSub"></p>
+        <div id="guardadasList"></div>
+      </section>
+    </div>
+  </main>
+
+  <script define:vars={{ jobs, guardadas, configured: Astro.locals.configured }}>
+    const state = { q: '', geo: '', modality: '', area: '' };
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const tagClass = (m) => (m === 'presencial' ? 'p' : m === 'híbrido' ? 'h' : 'r');
+
+    function render() {
+      const out = jobs.filter((j) => {
+        if (state.geo && j.geo !== state.geo) return false;
+        if (state.modality && j.modality !== state.modality) return false;
+        if (state.area && j.area !== state.area) return false;
+        if (state.q) {
+          const hay = `${j.title} ${j.company} ${j.area} ${j.source}`.toLowerCase();
+          if (!hay.includes(state.q)) return false;
+        }
+        return true;
+      });
+      $('count').textContent = `${out.length} de ${jobs.length}`;
+      $('rows').innerHTML = out.length
+        ? out.map((j) => `
+          <tr>
+            <td><a href="${j.url}" target="_blank" rel="noopener">${esc(j.title)}</a></td>
+            <td style="color:var(--dim)">${esc(j.company || '—')}</td>
+            <td style="color:var(--dim)">${esc(j.geo)}</td>
+            <td><span class="tag ${tagClass(j.modality)}">${esc(j.modality)}</span></td>
+            <td style="color:var(--dim)">${esc(j.area)}</td>
+            <td style="color:var(--dim-2);font-size:12px">${esc(j.source)}</td>
+            <td style="color:var(--dim-2);font-size:12px;white-space:nowrap">${j.days !== null ? j.days + ' d' : ''}</td>
+          </tr>`).join('')
+        : '<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:40px">Nada con esos filtros.</td></tr>';
+    }
+
+    document.querySelectorAll('[data-k]').forEach((el) =>
+      el.addEventListener('click', () => {
+        const k = el.dataset.k, v = el.dataset.v;
+        state[k] = state[k] === v ? '' : v;
+        document.querySelectorAll(`[data-k="${k}"]`).forEach((x) => x.classList.toggle('on', x.dataset.v === state[k]));
+        render();
+      }));
+
+    $('q').addEventListener('input', (e) => { state.q = e.target.value.toLowerCase().trim(); render(); });
+
+    // --- guardado ---
+    const LOCAL_KEY = 'radar.searches.v1';
+    const localSearches = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]'); } catch { return []; } };
+    const renderGuardadas = () => {
+      const items = configured ? guardadas : localSearches();
+      $('guardadasSub').textContent = configured
+        ? 'Se guardan en tu organización y sirven para generar alertas diarias.'
+        : 'Modo demostración: se guardan sólo en este navegador (localStorage). Con Supabase configurado van a la base.';
+      $('guardadasList').innerHTML = items.length
+        ? `<div class="grid3">${items.map((s) => `
+            <article class="card">
+              <h3 style="margin-top:0">${esc(s.name)}</h3>
+              <p style="font-size:12.5px;color:var(--dim-2)">${esc(JSON.stringify(s.filters))}</p>
+            </article>`).join('')}</div>`
+        : '<div class="empty"><strong>Todavía no guardaste ninguna</strong>Filtrá y usá “Guardar esta búsqueda”.</div>';
+    };
+
+    $('saveBtn').addEventListener('click', async () => {
+      const name = [state.geo || 'Todas', state.modality || 'todas las modalidades', state.area || 'todas las áreas']
+        .join(' · ') + (state.q ? ` · “${state.q}”` : '');
+      const filters = { ...state };
+      if (!configured) {
+        const list = localSearches();
+        list.push({ id: crypto.randomUUID(), name, filters });
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+        renderGuardadas();
+        return;
+      }
+      const res = await fetch('/api/busquedas', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name, filters }),
+      });
+      if (res.ok) location.href = '/busquedas?ok=1';
+    });
+
+    render();
+    renderGuardadas();
+  </script>
+</Layout>

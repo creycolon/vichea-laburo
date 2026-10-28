@@ -1,0 +1,25 @@
+# dependencias
+node_modules/
+.npm-cache/
+vendor/
+
+# builds
+dist/
+.astro/
+.output/
+
+# secretos: nunca al repo. La plantilla sí.
+.env
+.env.*
+!.env.example
+
+# datos de trabajo y artefactos personales
+work/
+
+# logs
+*.log
+npm-debug.log*
+
+# sistema
+.DS_Store
+Thumbs.db

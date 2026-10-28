@@ -1,0 +1,24 @@
+import fs from 'node:fs';
+const ID = '7484236EC8D20ED076FD69D8D7762119';
+const list = await (await fetch('http://127.0.0.1:9340/json/list')).json();
+const t = list.find(x => x.id === ID) ?? list.find(x => x.type === 'page' && x.url.includes('job-radar/index.html'));
+const ws = new WebSocket(t.webSocketDebuggerUrl);
+let id = 0; const pend = new Map();
+const call = (m, p = {}, ms = 8000) => new Promise(res => {
+  const i = ++id; pend.set(i, res);
+  ws.send(JSON.stringify({ id: i, method: m, params: p }));
+  setTimeout(() => { if (pend.has(i)) { pend.delete(i); res(null); } }, ms);
+});
+ws.onmessage = e => { const m = JSON.parse(e.data); if (m.id && pend.has(m.id)) { pend.get(m.id)(m.result ?? m.error); pend.delete(m.id); } };
+await new Promise(r => ws.onopen = r);
+await new Promise(r => setTimeout(r, 1800));
+const base = await call('Page.captureScreenshot', { format: 'png' });
+console.log('baseline screenshot:', base?.data ? 'ok' : 'FALLÓ');
+if (base?.data) fs.writeFileSync('work/radar-base.png', Buffer.from(base.data, 'base64'));
+await call('Runtime.evaluate', { expression: "document.getElementById('openSettings').click()" });
+await new Promise(r => setTimeout(r, 800));
+const s = await call('Page.captureScreenshot', { format: 'png' });
+console.log('overlay screenshot:', s?.data ? 'ok' : 'FALLÓ');
+if (s?.data) fs.writeFileSync('work/schedule.png', Buffer.from(s.data, 'base64'));
+ws.close();
+process.exit(0);

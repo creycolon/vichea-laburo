@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro';
+const err = Astro.url.searchParams.get('error');
+const ok = Astro.url.searchParams.get('ok');
+const configured = Astro.locals.configured;
+---
+<Layout title="Crear cuenta — Radar Junior">
+  <main class="auth">
+    <div class="wrap" style="display:grid;place-items:center">
+      <div class="auth-box">
+        <h1>Crear cuenta</h1>
+        <p class="sub">Gratis. Sin tarjeta. Tres campos y listo.</p>
+
+        {!configured && (
+          <div class="alert warn">
+            Supabase no está configurado: el formulario valida pero no puede crear la cuenta todavía.
+          </div>
+        )}
+        {err && <div class="alert err">{err}</div>}
+        {ok && <div class="alert ok">{ok}</div>}
+
+        <form method="post" action="/api/auth/registro">
+          <div class="field">
+            <label for="name">Nombre</label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="Cómo te llamás" />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required autocomplete="email" placeholder="vos@empresa.com" />
+          </div>
+          <div class="field">
+            <label for="password">Contraseña (mínimo 8 caracteres)</label>
+            <input id="password" name="password" type="password" required autocomplete="new-password" minlength="8" />
+          </div>
+          <button class="btn primary block" type="submit">Crear cuenta</button>
+          <span class="legal">Te vamos a mandar un correo para confirmar la cuenta.</span>
+        </form>
+
+        <div class="auth-foot">
+          <span>¿Ya tenés cuenta? <a href="/login">Ingresar</a></span>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

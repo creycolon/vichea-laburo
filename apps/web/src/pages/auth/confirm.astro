@@ -1,0 +1,14 @@
+---
+import { createSupabase } from '../../lib/supabase';
+
+const token_hash = Astro.url.searchParams.get('token_hash');
+const type = Astro.url.searchParams.get('type') as any;
+const supabase = createSupabase(Astro.cookies);
+
+if (token_hash && type && supabase) {
+  const { error } = await supabase.auth.verifyOtp({ token_hash, type });
+  if (!error) return Astro.redirect('/panel?ok=' + encodeURIComponent('Cuenta confirmada.'));
+  return Astro.redirect('/login?error=' + encodeURIComponent(error.message));
+}
+return Astro.redirect('/login?error=' + encodeURIComponent('Enlace inválido o vencido.'));
+---

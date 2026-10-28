@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+const err = Astro.url.searchParams.get('error');
+const ok = Astro.url.searchParams.get('ok');
+---
+<Layout title="Recuperar contraseña — Radar Junior">
+  <main class="auth">
+    <div class="wrap" style="display:grid;place-items:center">
+      <div class="auth-box">
+        <h1>Recuperar contraseña</h1>
+        <p class="sub">Te mandamos un enlace para elegir una nueva. Vence en una hora.</p>
+        {err && <div class="alert err">{err}</div>}
+        {ok && <div class="alert ok">{ok}</div>}
+        <form method="post" action="/api/auth/recuperar">
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required autocomplete="email" placeholder="vos@empresa.com" />
+          </div>
+          <button class="btn primary block" type="submit">Enviar enlace</button>
+        </form>
+        <div class="auth-foot"><a href="/login">Volver al ingreso</a></div>
+      </div>
+    </div>
+  </main>
+</Layout>

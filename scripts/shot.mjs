@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+const PORT = 9340;
+const list = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json();
+const t = list.find(x => x.type === 'page');
+const ws = new WebSocket(t.webSocketDebuggerUrl);
+let id = 0; const pend = new Map();
+const call = (m, p = {}) => new Promise(res => { const i = ++id; pend.set(i, res); ws.send(JSON.stringify({ id: i, method: m, params: p })); });
+ws.onmessage = e => { const m = JSON.parse(e.data); if (m.id && pend.has(m.id)) { pend.get(m.id)(m.result ?? m.error); pend.delete(m.id); } };
+await new Promise(r => ws.onopen = r);
+await call('Page.enable');
+await call('Emulation.setDeviceMetricsOverride', { width: 1440, height: 980, deviceScaleFactor: 1, mobile: false });
+await new Promise(r => setTimeout(r, 1500));
+const s = await call('Page.captureScreenshot', { format: 'png' });
+fs.writeFileSync('work/radar.png', Buffer.from(s.data, 'base64'));
+console.log('screenshot ok de', t.url);
+process.exit(0);

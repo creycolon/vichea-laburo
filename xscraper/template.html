@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar junior / trainee</title>
+<style>
+  :root {
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c232c; --line:#2a333f;
+    --txt:#e6edf3; --dim:#8b98a5; --accent:#4cc38a; --accent2:#5aa9f0; --warn:#f0b95a;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  header { padding:28px 32px 18px; border-bottom:1px solid var(--line); }
+  h1 { margin:0 0 6px; font-size:22px; letter-spacing:-.02em; }
+  .sub { color:var(--dim); font-size:13px; }
+  .stats { display:flex; gap:22px; margin-top:16px; flex-wrap:wrap; }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 16px; min-width:104px; }
+  .stat b { display:block; font-size:20px; }
+  .stat span { color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+  .controls { padding:16px 32px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+              position:sticky; top:0; background:rgba(14,17,22,.95); backdrop-filter:blur(8px);
+              border-bottom:1px solid var(--line); z-index:5; }
+  input[type=search] { background:var(--panel); border:1px solid var(--line); color:var(--txt);
+    border-radius:8px; padding:9px 12px; min-width:260px; font-size:14px; outline:none; }
+  input[type=search]:focus { border-color:var(--accent2); }
+  .chip { background:var(--panel); border:1px solid var(--line); color:var(--dim);
+    border-radius:999px; padding:6px 13px; font-size:12.5px; cursor:pointer; user-select:none; }
+  .chip:hover { color:var(--txt); border-color:#3a4653; }
+  .chip.on { background:#12351f; border-color:var(--accent); color:var(--accent); }
+  .chip.on.geo { background:#12293b; border-color:var(--accent2); color:var(--accent2); }
+  main { padding:22px 32px 60px; display:grid; gap:14px;
+         grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+          display:flex; flex-direction:column; gap:9px; transition:border-color .15s, transform .15s; }
+  .card:hover { border-color:#3d4b5c; transform:translateY(-1px); }
+  .card h2 { margin:0; font-size:15.5px; font-weight:600; line-height:1.35; }
+  .card h2 a { color:var(--txt); text-decoration:none; }
+  .card h2 a:hover { color:var(--accent2); }
+  .co { color:var(--dim); font-size:13px; }
+  .badges { display:flex; gap:6px; flex-wrap:wrap; margin-top:2px; }
+  .b { font-size:11px; padding:3px 8px; border-radius:6px; background:var(--panel2);
+       border:1px solid var(--line); color:var(--dim); }
+  .b.area { color:#c9b6ff; border-color:#3b2f5e; background:#1e1830; }
+  .b.geo { color:var(--accent2); border-color:#22384d; background:#111d28; }
+  .b.formacion { color:var(--warn); border-color:#4a3a1c; background:#241c0e; }
+  .b.mod { color:#8fd6c8; border-color:#1f3f3a; background:#0f201e; }
+  .b.mod.mod-h { color:#f0b95a; border-color:#4a3a1c; background:#241c0e; }
+  .b.mod.mod-p { color:#c9b6ff; border-color:#3b2f5e; background:#1e1830; }
+  .b.nuevo { color:var(--accent); border-color:#1e4130; background:#0f2419; }
+  .b.dudoso { color:#d68c8c; border-color:#4a2626; background:#241212; }
+  .meta { margin-top:auto; display:flex; justify-content:space-between; align-items:center;
+          font-size:12px; color:var(--dim); padding-top:8px; border-top:1px dashed var(--line); }
+  .meta a { color:var(--accent2); text-decoration:none; }
+  footer { padding:0 32px 40px; color:var(--dim); font-size:12px; }
+  .empty { grid-column:1/-1; text-align:center; color:var(--dim); padding:60px 0; }
+  .links { padding:0 32px 26px; }
+  .links h3 { margin:0 0 10px; font-size:13px; color:var(--dim); font-weight:600;
+              text-transform:uppercase; letter-spacing:.07em; }
+  .links .row { display:flex; gap:8px; flex-wrap:wrap; }
+  .links a { font-size:12.5px; color:var(--dim); text-decoration:none; border:1px solid var(--line);
+             background:var(--panel); padding:7px 12px; border-radius:8px; }
+  .links a:hover { color:var(--accent2); border-color:#3a4653; }
+  .ghost { background:transparent; border:1px solid var(--line); color:var(--dim); border-radius:8px;
+           padding:7px 12px; font-size:12.5px; cursor:pointer; }
+  .ghost:hover { color:var(--txt); border-color:#3a4653; }
+  .overlay { position:fixed; inset:0; background:rgba(5,8,12,.78); backdrop-filter:blur(4px);
+             display:none; align-items:flex-start; justify-content:center; z-index:50; padding:48px 16px; overflow:auto; }
+  .overlay.on { display:flex; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; width:min(680px,100%);
+           padding:24px 26px; }
+  .panel h2 { margin:0 0 4px; font-size:18px; }
+  .panel .hint { color:var(--dim); font-size:12.5px; margin:0 0 18px; line-height:1.5; }
+  .frow { display:grid; grid-template-columns:130px 1fr; gap:10px 14px; align-items:center; margin-bottom:12px; }
+  .frow > span { color:var(--dim); font-size:12.5px; }
+  select, input[type=time] { background:var(--panel2); border:1px solid var(--line); color:var(--txt);
+           border-radius:8px; padding:8px 10px; font-size:13.5px; }
+  .srcs { display:flex; flex-wrap:wrap; gap:8px; }
+  .srcs label { font-size:12.5px; color:var(--dim); background:var(--panel2); border:1px solid var(--line);
+                padding:5px 10px; border-radius:7px; display:flex; gap:6px; align-items:center; cursor:pointer; }
+  .out { background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:12px 14px;
+         font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; color:#9ae6b4;
+         white-space:pre-wrap; word-break:break-word; margin:14px 0 0; }
+  .out.dim { color:var(--dim); }
+  .actions { display:flex; gap:8px; margin-top:18px; }
+  .actions button { border-radius:8px; padding:9px 16px; font-size:13px; cursor:pointer; border:1px solid var(--line);
+                    background:var(--panel2); color:var(--txt); }
+  .actions button.primary { background:#12351f; border-color:var(--accent); color:var(--accent); }
+  .actions button:hover { border-color:#3a4653; }
+  .saved { color:var(--accent); font-size:12.5px; margin-left:auto; align-self:center; }
+  .err { margin:0 32px 20px; padding:10px 14px; border-radius:8px; font-size:12.5px;
+         background:#241a0e; border:1px solid #4a3a1c; color:var(--warn); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Radar junior / trainee</h1>
+  <div class="sub" id="sub"></div>
+  <div class="stats" id="stats"></div>
+  <div style="margin-top:16px"><button class="ghost" id="openSettings">⚙ Programación de actualizaciones</button></div>
+</header>
+
+<div class="controls">
+  <input type="search" id="q" placeholder="Buscar puesto, empresa, tecnología…">
+  <span class="chip on" data-k="kind" data-v="todas">Todas</span>
+  <span class="chip" data-k="kind" data-v="oferta">Ofertas</span>
+  <span class="chip" data-k="kind" data-v="formacion">Formación</span>
+  <span id="areas"></span>
+  <span id="mods"></span>
+  <span id="geos"></span>
+</div>
+
+<main id="grid"></main>
+<section class="links">
+  <h3>Búsquedas directas — tableros locales que no permiten automatización</h3>
+  <div class="row">
+    <a href="https://www.computrabajo.com.ar/trabajo-de-junior" target="_blank" rel="noopener">Computrabajo · junior</a>
+    <a href="https://www.computrabajo.com.ar/trabajo-de-pasantia" target="_blank" rel="noopener">Computrabajo · pasantías</a>
+    <a href="https://www.zonajobs.com.ar/empleos-busqueda-junior.html" target="_blank" rel="noopener">Zonajobs · junior</a>
+    <a href="https://www.bumeran.com.ar/empleos-busqueda-junior.html" target="_blank" rel="noopener">Bumeran · junior</a>
+    <a href="https://www.linkedin.com/jobs/search/?keywords=junior%20trainee&location=Argentina" target="_blank" rel="noopener">LinkedIn · AR</a>
+    <a href="https://www.getonbrd.com/empleos-junior" target="_blank" rel="noopener">GetOnBoard · junior</a>
+  </div>
+</section>
+<div class="overlay" id="overlay">
+  <div class="panel">
+    <h2>Programación de actualizaciones</h2>
+    <p class="hint">En este equipo la página es estática: acá se guarda la configuración y se genera la línea de cron
+       que después se instala en el servidor donde se despliegue. Nada corre en segundo plano desde el navegador.</p>
+
+    <div class="frow"><span>Frecuencia</span>
+      <select id="freq">
+        <option value="manual">Manual (solo cuando se pida)</option>
+        <option value="6h">Cada 6 horas</option>
+        <option value="12h">Cada 12 horas</option>
+        <option value="daily">Diaria</option>
+        <option value="weekly">Semanal</option>
+      </select>
+    </div>
+    <div class="frow"><span>Hora</span><input type="time" id="time" value="08:00"></div>
+    <div class="frow"><span>Día</span>
+      <select id="dow">
+        <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
+        <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option>
+        <option value="0">Domingo</option>
+      </select>
+    </div>
+    <div class="frow"><span>Fuentes</span>
+      <div class="srcs" id="srcs"></div>
+    </div>
+    <div class="frow"><span>Histórico</span>
+      <div class="srcs">
+        <label><input type="checkbox" id="hist" checked> Guardar un snapshot por día</label>
+      </div>
+    </div>
+    <div class="frow"><span>Avisos</span>
+      <div class="srcs">
+        <label><input type="checkbox" id="alert" checked> Reportar si una fuente falla</label>
+      </div>
+    </div>
+
+    <div class="out" id="cronOut"></div>
+    <div class="out dim" id="nextOut"></div>
+
+    <div class="actions">
+      <button class="primary" id="saveCfg">Guardar</button>
+      <button id="resetCfg">Restablecer predeterminados</button>
+      <button id="closeCfg">Cerrar</button>
+      <span class="saved" id="savedMsg"></span>
+    </div>
+  </div>
+</div>
+<footer id="foot"></footer>
+
+<script>
+const DATA = /*__DATA__*/;
+const state = { q:'', kind:'todas', area:'', geo:'', modality:'' };
+
+const sub = document.getElementById('sub');
+const d = new Date(DATA.generatedAt);
+sub.textContent = `Revisadas ${DATA.total} ofertas de fuentes públicas · ${DATA.kept} pasaron el filtro junior/trainee · generado ${d.toLocaleString('es-AR')} · los links abren la oferta original`;
+
+document.getElementById('stats').innerHTML = [
+  ['Total', DATA.kept], ['Ofertas', DATA.counts.oferta], ['Formación', DATA.counts.formacion],
+  ['Alta confianza', DATA.counts.alta],
+].map(([k,v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('');
+
+const areas = [...new Set(DATA.jobs.map(j => j.area))].sort();
+document.getElementById('areas').innerHTML = areas.map(a =>
+  `<span class="chip" data-k="area" data-v="${a}">${a}</span>`).join(' ');
+
+document.getElementById('mods').innerHTML = ['remoto','híbrido','presencial'].map(m =>
+  `<span class="chip" data-k="modality" data-v="${m}">${m}</span>`).join(' ');
+
+const geos = ['Argentina','LATAM','Global / remoto'];
+document.getElementById('geos').innerHTML = geos.map(g =>
+  `<span class="chip geo" data-k="geo" data-v="${g}">${g}</span>`).join(' ');
+
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+  const k = c.dataset.k, v = c.dataset.v;
+  if (k === 'kind') {
+    state.kind = (state.kind === v) ? 'todas' : v;
+    document.querySelectorAll('[data-k=kind]').forEach(x => x.classList.toggle('on', x.dataset.v === state.kind));
+    if (state.kind === 'todas') document.querySelector('[data-k=kind][data-v=todas]').classList.add('on');
+  } else {
+    state[k] = (state[k] === v) ? '' : v;
+    document.querySelectorAll(`[data-k=${k}]`).forEach(x => x.classList.toggle('on', x.dataset.v === state[k]));
+  }
+  render();
+}));
+
+document.getElementById('q').addEventListener('input', e => { state.q = e.target.value.toLowerCase().trim(); render(); });
+
+function render() {
+  const out = DATA.jobs.filter(j => {
+    if (state.kind !== 'todas' && j.kind !== state.kind) return false;
+    if (state.area && j.area !== state.area) return false;
+    if (state.geo && j.geo !== state.geo) return false;
+    if (state.modality && j.modality !== state.modality) return false;
+    if (state.q) {
+      const hay = `${j.title} ${j.company} ${j.tags.join(' ')} ${j.location}`.toLowerCase();
+      if (!hay.includes(state.q)) return false;
+    }
+    return true;
+  });
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = out.length ? out.map(j => `
+    <article class="card">
+      <h2><a href="${j.url}" target="_blank" rel="noopener">${esc(j.title)}</a></h2>
+      <div class="co">${esc(j.company || '—')}</div>
+      <div class="badges">
+        ${j.kind === 'formacion' ? '<span class="b formacion">formación</span>' : ''}
+        <span class="b area">${esc(j.area)}</span>
+        <span class="b geo">${esc(j.geo)}</span>
+        <span class="b mod ${j.modality === 'presencial' ? 'mod-p' : j.modality === 'híbrido' ? 'mod-h' : ''}">${esc(j.modality)}</span>
+        ${j.days !== null && j.days <= 7 ? '<span class="b nuevo">nueva</span>' : ''}
+        ${j.confidence === 'media' ? '<span class="b dudoso">revisar</span>' : ''}
+      </div>
+      <div class="meta">
+        <span>${esc(j.source)} · ${esc(j.location || 'sin dato')}${j.days !== null ? ` · hace ${j.days} d` : ''}</span>
+        <a href="${j.url}" target="_blank" rel="noopener">Ver →</a>
+      </div>
+    </article>`).join('') : '<div class="empty">Nada con esos filtros.</div>';
+}
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+render();
+
+// ---------- pantalla de programación ----------
+const SRC_ALL = [...new Set(DATA.jobs.map(j => j.source))].sort();
+const CFG_KEY = 'radar.schedule.v1';
+const DEFAULTS = {
+  freq: 'daily', time: '08:00', dow: '1',
+  sources: Object.fromEntries(SRC_ALL.map(s => [s, true])),
+  hist: true, alert: true,
+};
+const loadCfg = () => {
+  try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(CFG_KEY) || '{}') }; }
+  catch { return { ...DEFAULTS }; }
+};
+let cfg = loadCfg();
+
+const $ = (id) => document.getElementById(id);
+const pad = (n) => String(n).padStart(2, '0');
+
+function renderSources() {
+  $('srcs').innerHTML = SRC_ALL.map(s =>
+    `<label><input type="checkbox" data-src="${s}" ${cfg.sources[s] !== false ? 'checked' : ''}> ${s}</label>`).join('');
+  $('srcs').querySelectorAll('input[data-src]').forEach(el => el.addEventListener('change', () => {
+    cfg.sources[el.dataset.src] = el.checked; drawSchedule();
+  }));
+}
+function drawForm() {
+  $('freq').value = cfg.freq;
+  $('time').value = cfg.time;
+  $('dow').value = cfg.dow;
+  $('hist').checked = !!cfg.hist;
+  $('alert').checked = !!cfg.alert;
+  $('dow').disabled = cfg.freq !== 'weekly';
+  $('time').disabled = cfg.freq === 'manual' || cfg.freq === '6h' || cfg.freq === '12h';
+  renderSources();
+  drawSchedule();
+}
+function cronOf(c) {
+  const [hh, mm] = (c.time || '08:00').split(':').map(Number);
+  if (c.freq === 'manual') return null;
+  if (c.freq === '6h') return '0 */6 * * *';
+  if (c.freq === '12h') return '0 */12 * * *';
+  if (c.freq === 'weekly') return `${mm || 0} ${hh} * * ${c.dow}`;
+  return `${mm || 0} ${hh} * * *`;
+}
+function nextRuns(c, n = 3) {
+  const out = [];
+  const [hh, mm] = (c.time || '08:00').split(':').map(Number);
+  let d = new Date();
+  if (c.freq === 'manual') return out;
+  if (c.freq === '6h' || c.freq === '12h') {
+    const step = c.freq === '6h' ? 6 : 12;
+    let t = new Date(d); t.setMinutes(0, 0, 0);
+    t.setHours(Math.ceil((t.getHours() + (t.getMinutes() > 0 ? 1 : 0)) / step) * step);
+    for (let i = 0; i < n; i++) { out.push(new Date(t)); t = new Date(t.getTime() + step * 3600e3); }
+    return out;
+  }
+  let t = new Date(d); t.setHours(hh, mm, 0, 0);
+  if (t <= d) t.setDate(t.getDate() + 1);
+  if (c.freq === 'weekly') { while (t.getDay() !== Number(c.dow)) t.setDate(t.getDate() + 1); }
+  for (let i = 0; i < n; i++) {
+    out.push(new Date(t));
+    t = new Date(t); t.setDate(t.getDate() + (c.freq === 'weekly' ? 7 : 1));
+  }
+  return out;
+}
+function drawSchedule() {
+  const cron = cronOf(cfg);
+  const act = Object.values(cfg.sources).filter(Boolean).length;
+  const cmd = 'cd /srv/job-radar && /usr/bin/node fetch.mjs >> cron.log 2>&1';
+  if (!cron) {
+    $('cronOut').textContent = 'Sin automatización: se ejecuta solo a pedido.\n\nPara el servidor no hace falta instalar nada.';
+  } else {
+    $('cronOut').textContent =
+      `# crontab -e   (en el servidor)\n${cron} ${cmd}\n\n` +
+      `# fuente: ${act}/${SRC_ALL.length} fuentes · histórico ${cfg.hist ? 'sí' : 'no'} · avisos de falla ${cfg.alert ? 'sí' : 'no'}`;
+  }
+  const runs = nextRuns(cfg);
+  $('nextOut').textContent = runs.length
+    ? 'próximas ejecuciones: ' + runs.map(d => d.toLocaleString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })).join('   ·   ')
+    : 'próximas ejecuciones: —';
+}
+$('openSettings').addEventListener('click', () => { $('overlay').classList.add('on'); drawForm(); });
+$('closeCfg').addEventListener('click', () => $('overlay').classList.remove('on'));
+$('overlay').addEventListener('click', (e) => { if (e.target.id === 'overlay') $('overlay').classList.remove('on'); });
+['freq', 'time', 'dow', 'hist', 'alert'].forEach(id =>
+  $(id).addEventListener('change', () => {
+    cfg.freq = $('freq').value; cfg.time = $('time').value; cfg.dow = $('dow').value;
+    cfg.hist = $('hist').checked; cfg.alert = $('alert').checked;
+    drawForm();
+  }));
+$('saveCfg').addEventListener('click', () => {
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  $('savedMsg').textContent = 'guardado ✓';
+  setTimeout(() => { $('savedMsg').textContent = ''; }, 2000);
+});
+$('resetCfg').addEventListener('click', () => {
+  cfg = { ...DEFAULTS, sources: { ...DEFAULTS.sources } };
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  drawForm();
+  $('savedMsg').textContent = 'predeterminados ✓';
+  setTimeout(() => { $('savedMsg').textContent = ''; }, 2000);
+});
+drawForm();
+
+document.getElementById('foot').textContent = DATA.errors?.length
+  ? 'Fuentes con problemas: ' + DATA.errors.join(' · ')
+  : 'Todas las fuentes respondieron.';
+</script>
+</body>
+</html>
