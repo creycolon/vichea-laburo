@@ -50,6 +50,34 @@ El panel muestra un cartel amarillo; nunca se activa en producción ni con clave
 | `/api/waitlist` | POST | Guarda email en `waitlist` (RLS: insert anónimo, lectura cerrada) |
 | `/auth/confirm` | GET | Verifica el token del correo y redirige al panel |
 
+## Deploy (Vercel)
+
+El proyecto usa dos adapters según el entorno: `@astrojs/node` en local y `@astrojs/vercel`
+cuando existe la variable `VERCEL` (la define Vercel sola en su build). No hay que cambiar nada
+a mano al desplegar.
+
+1. Importar el repo en Vercel → **Root Directory: `apps/web`**.
+2. Framework preset: **Astro** (lo detecta solo).
+3. Variables de entorno: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PUBLIC_SITE_URL`
+   (esta última con el dominio final, sin barra al final).
+4. Deploy.
+5. En Supabase → **Authentication → URL Configuration**, agregar
+   `https://TU-DOMINIO/auth/confirm` a las Redirect URLs. Sin esto, los mails de verificación
+   vuelven a localhost.
+
+**Datos en el deploy:** el `prebuild` copia `xscraper/data.json` a `src/data/latest.json` y Vite lo
+embebe en el bundle. Si el directorio padre no estuviera disponible en el build, el script avisa y
+usa el `latest.json` versionado — el sitio no se rompe, muestra el último snapshot conocido.
+Consecuencia: **cada deploy congela los datos**; para que se actualicen solos hace falta la ingesta
+a Postgres.
+
+**Build de Vercel verificado en local:**
+
+```bash
+VERCEL=1 npm run build      # genera .vercel/output (Build Output API v3)
+npm run build               # genera dist/ standalone para Node
+```
+
 ## Variables de entorno
 
 | Variable | Para qué |

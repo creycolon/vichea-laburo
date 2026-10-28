@@ -26,3 +26,6 @@ Thumbs.db
 
 # claves locales de despliegue (nunca al repo)
 .ssh/
+
+# salida del build de Vercel
+.vercel/
