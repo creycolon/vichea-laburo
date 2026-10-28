@@ -1,5 +1,4 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import latest from '../data/latest.json';
 
 export type JobRow = {
   title: string;
@@ -10,35 +9,16 @@ export type JobRow = {
   source: string;
   url: string;
   days: number | null;
+  seniority?: string;
 };
 
 /**
- * Lee las ofertas del snapshot del scraper. Cuando la ingesta escriba en Postgres,
- * esta función se reemplaza por una query a `jobs` y el resto de la app no cambia.
+ * Ofertas para la tabla del panel. Mismo origen que las métricas (`src/data/latest.json`,
+ * copiado por el prebuild desde XScraper). Cuando la ingesta escriba en Postgres, esta
+ * función pasa a ser una query a `jobs` y las páginas no cambian.
  */
 export function getJobs(): JobRow[] {
-  const candidates = [
-    path.resolve(process.cwd(), '../../xscraper/data.json'),
-    path.resolve(process.cwd(), 'xscraper/data.json'),
-  ];
-  for (const file of candidates) {
-    try {
-      const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
-      return (raw.jobs ?? []).map((j: any) => ({
-        title: j.title ?? '',
-        company: j.company ?? '',
-        geo: j.geo ?? '',
-        modality: j.modality ?? '',
-        area: j.area ?? '',
-        source: j.source ?? '',
-        url: j.url ?? '#',
-        days: typeof j.days === 'number' ? j.days : null,
-      }));
-    } catch {
-      // siguiente candidato
-    }
-  }
-  return [];
+  return (latest.jobs ?? []) as JobRow[];
 }
 
 /** Organización del usuario logueado (la primera membership). Null si no hay. */

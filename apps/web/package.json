@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "sync": "node scripts/sync-data.mjs",
+    "predev": "node scripts/sync-data.mjs",
     "dev": "astro dev --host 127.0.0.1 --port 4321",
+    "prebuild": "node scripts/sync-data.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check"
