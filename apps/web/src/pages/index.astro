@@ -8,6 +8,7 @@ const updated = s.updatedAt
   : 'sin datos todavía';
 const pct = (n: number) => (s.total ? Math.round((n / s.total) * 100) : 0);
 const alta = Astro.url.searchParams.get('alta');
+const demo = Astro.locals.demo;
 ---
 
 <Layout title="Vichea Laburo — inteligencia de demanda laboral junior en LATAM">
@@ -22,9 +23,19 @@ const alta = Astro.url.searchParams.get('alta');
           dónde se está abriendo la puerta para perfiles que recién empiezan.
         </p>
         <div class="hero-cta">
-          <a class="btn primary" href="/registro">Probar gratis</a>
-          <a class="btn" href="#producto">Ver qué incluye</a>
-          <span class="note">Sin tarjeta. La muestra se actualiza sola.</span>
+          {demo ? (
+            <>
+              <a class="btn primary" href="/panel">Ver demo en vivo</a>
+              <a class="btn" href="#producto">Ver qué incluye</a>
+              <span class="note">Demo con datos reales · el registro se habilita al conectar la base.</span>
+            </>
+          ) : (
+            <>
+              <a class="btn primary" href="/registro">Probar gratis</a>
+              <a class="btn" href="#producto">Ver qué incluye</a>
+              <span class="note">Sin tarjeta. La muestra se actualiza sola.</span>
+            </>
+          )}
         </div>
 
         <div class="stats">

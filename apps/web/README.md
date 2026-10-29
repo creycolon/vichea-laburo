@@ -35,9 +35,20 @@ Desde ese momento: registro → correo de confirmación → `/auth/confirm` → 
 
 ## Modo demostración
 
-`.env` puede traer `DEV_DEMO=1`. Sólo en desarrollo, y sólo si Supabase no está configurado,
-permite entrar a `/panel` con una sesión falsa (`demo@radar.local`) para revisar el diseño.
-El panel muestra un cartel amarillo; nunca se activa en producción ni con claves presentes.
+Permite mostrar el producto —landing, panel y tabla de ofertas— sin backend. Exige un opt-in
+explícito y se desactiva solo si Supabase está configurado:
+
+| Variable | Dónde | Efecto |
+|---|---|---|
+| `DEV_DEMO=1` | `.env` local | habilita la demo sólo en `astro dev` |
+| `PUBLIC_DEMO=1` | variables de entorno del hosting | habilita la demo **también en el build de producción** |
+
+Con la demo activa: la landing muestra "Ver demo en vivo", `/panel` y `/busquedas` abren con un
+usuario ficticio (`demo@vichea-laburo.local`) y un cartel amarillo visible. Las pantallas de
+registro e ingreso avisan que el registro todavía no está abierto.
+
+**Para producción real: no setear `PUBLIC_DEMO`.** Sin esa variable, y apenas `SUPABASE_URL` y
+`SUPABASE_ANON_KEY` existen, las rutas vuelven a exigir sesión de verdad (302 a `/login`).
 
 ## Endpoints
 

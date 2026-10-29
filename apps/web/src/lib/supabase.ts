@@ -38,6 +38,16 @@ export function createSupabase(cookies: AstroCookies) {
   });
 }
 
+/**
+ * Modo demostración: deja entrar a /panel y /busquedas sin backend, con un usuario ficticio
+ * y un cartel visible. Se activa con PUBLIC_DEMO=1 (pensado para mostrar el producto antes de
+ * tener Supabase) o con DEV_DEMO=1 en desarrollo. Nunca se activa si Supabase está configurado.
+ */
+export const demoEnabled = () =>
+  (import.meta.env as Record<string, any>).PUBLIC_DEMO === '1' ||
+  (import.meta.env.DEV &&
+    ((process.env as Record<string, any>).DEV_DEMO === '1' || (import.meta.env as Record<string, any>).DEV_DEMO === '1'));
+
 /** Sesión actual (o null). Nunca lanza: si Supabase falla, se trata como anónimo. */
 export async function getUser(cookies: AstroCookies) {
   const supabase = createSupabase(cookies);

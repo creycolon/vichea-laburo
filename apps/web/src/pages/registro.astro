@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 const err = Astro.url.searchParams.get('error');
 const ok = Astro.url.searchParams.get('ok');
 const configured = Astro.locals.configured;
+const demo = Astro.locals.demo;
 ---
 <Layout title="Crear cuenta — Vichea Laburo">
   <main class="auth">
@@ -11,7 +12,12 @@ const configured = Astro.locals.configured;
         <h1>Crear cuenta</h1>
         <p class="sub">Gratis. Sin tarjeta. Tres campos y listo.</p>
 
-        {!configured && (
+        {demo ? (
+          <div class="alert warn">
+            Estás viendo una demo: el registro todavía no está abierto. Podés explorar el panel
+            desde <a href="/panel">Ver demo</a>.
+          </div>
+        ) : !configured && (
           <div class="alert warn">
             Supabase no está configurado: el formulario valida pero no puede crear la cuenta todavía.
           </div>

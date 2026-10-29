@@ -4,6 +4,7 @@ const err = Astro.url.searchParams.get('error');
 const ok = Astro.url.searchParams.get('ok');
 const next = Astro.url.searchParams.get('next') ?? '/panel';
 const configured = Astro.locals.configured;
+const demo = Astro.locals.demo;
 ---
 <Layout title="Ingresar — Vichea Laburo">
   <main class="auth">
@@ -12,7 +13,12 @@ const configured = Astro.locals.configured;
         <h1>Ingresar</h1>
         <p class="sub">Entrá para ver el radar completo y guardar búsquedas.</p>
 
-        {!configured && (
+        {demo ? (
+          <div class="alert warn">
+            Estás viendo una demo. El ingreso con cuenta se habilita cuando el servicio esté publicado.
+            Mientras tanto, entrá directo desde <a href="/panel">Ver demo</a>.
+          </div>
+        ) : !configured && (
           <div class="alert warn">
             Supabase no está configurado. Copiá <code>.env.example</code> a <code>.env</code>,
             pegá <code>SUPABASE_URL</code> y <code>SUPABASE_ANON_KEY</code>, y reiniciá el servidor.

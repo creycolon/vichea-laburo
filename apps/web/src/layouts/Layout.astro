@@ -3,6 +3,7 @@ import '../styles/global.css';
 interface Props { title: string; description?: string; }
 const { title, description = 'Inteligencia de demanda laboral junior y trainee en LATAM.' } = Astro.props;
 const user = Astro.locals.user;
+const demo = Astro.locals.demo;
 ---
 <!doctype html>
 <html lang="es-AR">
@@ -24,7 +25,7 @@ const user = Astro.locals.user;
           <a href="/#precios">Precios</a>
         </nav>
         <div class="actions">
-          {user ? (
+          {user || demo ? (
             <a class="btn primary" href="/panel">Ir al panel</a>
           ) : (
             <>

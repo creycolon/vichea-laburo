@@ -1,18 +1,19 @@
 import { defineMiddleware } from 'astro:middleware';
-import { getUser } from './lib/supabase';
+import { getUser, demoEnabled } from './lib/supabase';
 
 const PROTECTED = ['/panel', '/busquedas'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { user, configured } = await getUser(context.cookies);
 
-  // Modo demostración: sólo en desarrollo, sólo si Supabase no está configurado y
-  // sólo si se pide explícitamente con DEV_DEMO=1. Sirve para ver el panel sin backend.
-  const demo = import.meta.env.DEV && !configured && (process.env.DEV_DEMO === '1' || (import.meta.env as any).DEV_DEMO === '1');
+  // Modo demostración: exige un opt-in explícito (PUBLIC_DEMO=1 o DEV_DEMO=1) y que
+  // Supabase NO esté configurado. Sirve para mostrar el producto sin backend.
+  const demo = !configured && demoEnabled();
   context.locals.user = user ?? (demo
-    ? ({ id: 'demo', email: 'demo@radar.local', user_metadata: { name: 'demo' } } as any)
+    ? ({ id: 'demo', email: 'demo@vichea-laburo.local', user_metadata: { name: 'visitante' } } as any)
     : null);
   context.locals.configured = configured;
+  context.locals.demo = demo;
 
   const isProtected = PROTECTED.some((p) => context.url.pathname.startsWith(p));
   if (isProtected && !context.locals.user) {
