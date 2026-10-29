@@ -4,7 +4,8 @@ import { getStats } from '../lib/stats';
 
 const user = Astro.locals.user!;
 const s = getStats();
-const demo = Astro.locals.configured === false;
+const demo = Astro.locals.configured === false && Astro.locals.demo;
+const dev = import.meta.env.DEV;
 const nombre = (user.user_metadata?.name as string | undefined) || user.email?.split('@')[0] || 'hola';
 ---
 <Layout title="Panel — Vichea Laburo">
@@ -23,8 +24,9 @@ const nombre = (user.user_metadata?.name as string | undefined) || user.email?.s
 
       {demo && (
         <div class="alert warn">
-          Sesión de demostración: Supabase no está configurado. Cuando pegues las claves en <code>.env</code>,
-          este panel pasa a leer tu usuario real.
+          {dev
+            ? 'Sesión de demostración: Supabase no está configurado. Cuando pegues las claves en .env, este panel pasa a leer tu usuario real.'
+            : 'Estás viendo una demostración con datos reales de portales públicos. El registro y las búsquedas guardadas se habilitan cuando publiquemos el servicio.'}
         </div>
       )}
 
