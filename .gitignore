@@ -34,3 +34,6 @@ Thumbs.db
 apps/*/dist/
 apps/*/.vercel/
 apps/*/.astro/
+
+# datos de prospección (personas reales, no van al repo)
+prospectos/prospectos.json
