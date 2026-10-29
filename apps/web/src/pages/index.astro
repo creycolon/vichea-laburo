@@ -4,7 +4,8 @@ import { getStats } from '../lib/stats';
 
 const s = getStats();
 const updated = s.updatedAt
-  ? new Date(s.updatedAt).toLocaleString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+  // En Vercel el render corre en UTC; la hora se muestra en horario argentino.
+  ? new Date(s.updatedAt).toLocaleString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' })
   : 'sin datos todavía';
 const pct = (n: number) => (s.total ? Math.round((n / s.total) * 100) : 0);
 const alta = Astro.url.searchParams.get('alta');

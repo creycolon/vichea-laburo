@@ -3,7 +3,8 @@ import { radar } from '../lib/data';
 
 const fmt = (n: number) => n.toLocaleString('es-AR');
 const updated = radar.generatedAt
-  ? new Date(radar.generatedAt).toLocaleString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+  // Vercel renderiza en UTC: sin timeZone explícita la hora sale corrida 3 horas.
+  ? new Date(radar.generatedAt).toLocaleString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' })
   : 'sin datos';
 const top = (o: Record<string, number>) => Object.entries(o).sort((a, b) => b[1] - a[1]);
 const totalMod = radar.total || 1;
