@@ -21,7 +21,7 @@ const chrome = spawn('/usr/bin/google-chrome', [
   `--user-data-dir=${UD}`,
   `--profile-directory=${PROFILE}`,
   `--remote-debugging-port=${PORT}`,
-  '--no-sandbox',            // chrome-sandbox está owned por `nobody` en este sistema
+  '--no-sandbox', '--test-type',   // sandbox roto en este equipo; --test-type silencia el aviso
   '--disable-crash-reporter',
   '--no-first-run',
   '--no-default-browser-check',
