@@ -1,0 +1,1 @@
+const MENSAJE = (p) => `Hola ${p.nombre}, vi que reclutás${p.empresa ? ` en ${p.empresa}` : ''}. Armé un radar que releva los portales de empleo todos los días y muestra las búsquedas junior abiertas en AMBA: hoy 69, en 46 empresas, con modalidad real y cuántos días llevan sin cubrirse. Sin registro: vichea-laburo.vercel.app — ¿te resulta útil?`;

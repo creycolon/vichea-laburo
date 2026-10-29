@@ -4,6 +4,23 @@ Herramienta local para contactar reclutadores sin parecer envío masivo. **No bu
 scrapea X**: eso viola sus términos y expone la cuenta. El descubrimiento lo hacés vos (la
 búsqueda de X es buena para eso); el script se ocupa de lo repetitivo.
 
+## Descubrimiento automático (Apify)
+
+X no tiene búsqueda pública de personas y Nitter quedó dado de baja por reclamos legales. La vía
+que funciona es **Apify**, que ya usás para Computrabajo: el actor `apidojo/tweet-scraper` cobra
+**US$0,0001 por tweet** (1.000 tuits = 10 centavos) y el tier gratuito da US$5 mensuales.
+
+```bash
+echo 'APIFY_TOKEN=apify_api_...' > .env     # https://console.apify.com/account/integrations
+
+node discover.mjs "recruiter CABA"          # muestra los autores
+node discover.mjs "recruiter CABA" --save   # los agrega como pendientes
+node discover.mjs '("buscamos" OR "estamos buscando") junior (CABA OR Argentina) lang:es -filter:replies since:2026-10-15' --max 200 --save
+```
+
+Toma los autores únicos de los tuits que matchean la query, descarta los que ya están en la lista
+y guarda nombre, handle y bio (la bio se usa como nota al lado del mensaje).
+
 ## Flujo
 
 ```bash
