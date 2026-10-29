@@ -264,6 +264,10 @@ footer.site a:hover { color: var(--txt); }
 
 /* ---------- nav en pantallas chicas ---------- */
 @media (max-width: 560px) {
+  .profile-head { flex-wrap: wrap; row-gap: 4px; }
+  .profile-head strong { white-space: nowrap; }
+  .profile-head .dim { flex: 1 1 100%; order: 2; font-size: 12px; }
+  .profile-head .chip { order: 3; margin-left: auto; }
   .nav .wrap { gap: 8px; height: 58px; }
   .brand { white-space: nowrap; font-size: 15px; gap: 8px; }
   .brand .dot { width: 22px; height: 22px; border-radius: 7px; }
