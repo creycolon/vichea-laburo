@@ -325,5 +325,7 @@ insert into sources (slug, name, kind, country, base_url, config) values
   ('vacantesdigitales', 'Vacantes Digitales', 'api', null, 'https://vacantesdigitales.com', '{"experience":"junior"}'),
   ('remotive', 'Remotive', 'api', null, 'https://remotive.com', '{}'),
   ('remoteok', 'RemoteOK', 'api', null, 'https://remoteok.com', '{}'),
-  ('wwr', 'We Work Remotely', 'rss', null, 'https://weworkremotely.com', '{}')
+  ('wwr', 'We Work Remotely', 'rss', null, 'https://weworkremotely.com', '{}'),
+  ('himalayas', 'Himalayas', 'api', null, 'https://himalayas.app', '{}'),
+  ('arbeitnow', 'Arbeitnow', 'api', null, 'https://www.arbeitnow.com', '{}')
 on conflict (slug) do nothing;

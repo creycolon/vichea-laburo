@@ -9,5 +9,8 @@
     "diff": "node cli.mjs --diff",
     "test": "node --test \"test/*.test.mjs\"",
     "plan": "node cli.mjs --plan"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0"
   }
 }

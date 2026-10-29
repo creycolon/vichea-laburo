@@ -6,6 +6,18 @@
 
 import { createHash } from 'node:crypto';
 
+/** Nombre de fuente del scraper -> slug que ya existe en la tabla `sources`. */
+export const SOURCE_SLUGS = {
+  Computrabajo: 'computrabajo-ar',
+  GetOnBoard: 'getonboard',
+  VacantesDigitales: 'vacantesdigitales',
+  Remotive: 'remotive',
+  RemoteOK: 'remoteok',
+  WWR: 'wwr',
+  Himalayas: 'himalayas',
+  Arbeitnow: 'arbeitnow',
+};
+
 /** Slug estable para empresas, ubicaciones y fuentes. */
 export const slugify = (s = '') =>
   String(s)
@@ -75,7 +87,7 @@ export function buildPlan(jobs, { sourceSlug = 'xscraper' } = {}) {
         seniority,
         area: j.area ?? null,
         status: 'open',
-        source_slug: j.source ? slugify(j.source) : sourceSlug,
+        source_slug: SOURCE_SLUGS[j.source] ?? slugify(j.source ?? sourceSlug),
         source_url: j.url,
         posted_days_ago: j.days ?? null,
       };
@@ -85,7 +97,7 @@ export function buildPlan(jobs, { sourceSlug = 'xscraper' } = {}) {
     // Cada avistamiento, aunque la oferta canónica ya exista (otra fuente).
     records.push({
       dedupe_hash: hash,
-      source_slug: j.source ? slugify(j.source) : sourceSlug,
+      source_slug: SOURCE_SLUGS[j.source] ?? slugify(j.source ?? sourceSlug),
       url: j.url,
       external_id: null,
     });
@@ -112,4 +124,122 @@ export function summarize(plan) {
     `avistamientos: ${plan.records.length}`,
     `fuentes:    ${plan.sourceSlugs.join(', ')}`,
   ].join('\n  ');
+}
+
+// ---------------------------------------------------------------------------
+// Escritura
+// ---------------------------------------------------------------------------
+
+const chunk = (arr, n) => arr.reduce((a, _, i) => (i % n ? a : [...a, arr.slice(i, i + n)]), []);
+
+/**
+ * Aplica el plan contra Supabase con la service_role (bypassa RLS).
+ * Idempotente: todas las escrituras son upsert por clave natural, así que correrla
+ * dos veces seguidas no duplica nada.
+ */
+export async function applyPlan(supabase, plan, { log = () => {} } = {}) {
+  const stats = { companies: 0, locations: 0, jobs: 0, newJobs: 0, records: 0, runs: 0 };
+
+  // 1. fuentes ya sembradas
+  const { data: srcRows, error: srcErr } = await supabase.from('sources').select('id,slug');
+  if (srcErr) throw new Error(`sources: ${srcErr.message}`);
+  const srcId = new Map((srcRows ?? []).map((r) => [r.slug, r.id]));
+  const missing = plan.sourceSlugs.filter((s) => !srcId.has(s));
+  if (missing.length) throw new Error(`fuentes no sembradas en la base: ${missing.join(', ')}`);
+
+  // 2. empresas
+  if (plan.companies.length) {
+    const rows = plan.companies.map((c) => ({ slug: c.slug, name: c.name }));
+    const { error } = await supabase.from('companies').upsert(rows, { onConflict: 'slug' });
+    if (error) throw new Error(`companies: ${error.message}`);
+    const { data } = await supabase.from('companies').select('id,slug').in('slug', rows.map((r) => r.slug));
+    stats.companies = (data ?? []).length;
+    for (const r of data ?? []) srcId.set(`company:${r.slug}`, r.id);
+  }
+
+  // 3. ubicaciones (region y city NOT NULL: el upsert colisiona bien)
+  if (plan.locations.length) {
+    const { error } = await supabase.from('locations').upsert(plan.locations, { onConflict: 'country,region,city' });
+    if (error) throw new Error(`locations: ${error.message}`);
+    const { data } = await supabase
+      .from('locations').select('id,country,region,city')
+      .in('country', [...new Set(plan.locations.map((l) => l.country))]);
+    stats.locations = (data ?? []).length;
+    for (const r of data ?? []) srcId.set(`loc:${r.country}|${r.region}|${r.city}`, r.id);
+  }
+
+  // 4. qué ofertas ya existían (para emitir el evento 'opened' sólo una vez)
+  const hashes = plan.jobs.map((j) => j.dedupe_hash);
+  const existing = new Set();
+  for (const part of chunk(hashes, 100)) {
+    const { data, error } = await supabase.from('jobs').select('dedupe_hash').in('dedupe_hash', part);
+    if (error) throw new Error(`jobs(pre): ${error.message}`);
+    for (const r of data ?? []) existing.add(r.dedupe_hash);
+  }
+
+  // 5. ofertas canónicas
+  if (plan.jobs.length) {
+    const rows = plan.jobs.map((j) => ({
+      dedupe_hash: j.dedupe_hash,
+      title: j.title,
+      company_id: srcId.get(`company:${j.company_slug}`) ?? null,
+      location_id: srcId.get(`loc:${j.location_key}`) ?? null,
+      modality: j.modality,
+      seniority: j.seniority,
+      area: j.area,
+      status: 'open',
+      last_seen_at: new Date().toISOString(),
+    }));
+    const { error } = await supabase.from('jobs').upsert(rows, { onConflict: 'dedupe_hash' });
+    if (error) throw new Error(`jobs: ${error.message}`);
+    stats.jobs = rows.length;
+  }
+
+  // 6. avistamientos (una fila por URL; el unique(url) hace el trabajo)
+  if (plan.records.length) {
+    const rows = [...new Map(plan.records.map((r) => [r.url, r])).values()]
+      .filter((r) => srcId.has(r.source_slug))
+      .map((r) => ({
+        job_id: null, // se resuelve abajo
+        source_id: srcId.get(r.source_slug),
+        url: r.url,
+        dedupe_hash: r.dedupe_hash,
+      }));
+    const { data: jobRows, error: jobErr } = await supabase
+      .from('jobs').select('id,dedupe_hash').in('dedupe_hash', [...new Set(rows.map((r) => r.dedupe_hash))]);
+    if (jobErr) throw new Error(`jobs(map): ${jobErr.message}`);
+    const jobId = new Map((jobRows ?? []).map((r) => [r.dedupe_hash, r.id]));
+    const payload = rows.map(({ dedupe_hash, ...r }) => ({ ...r, job_id: jobId.get(dedupe_hash) })).filter((r) => r.job_id);
+    if (payload.length) {
+      const { error } = await supabase.from('job_source_records').upsert(payload, { onConflict: 'url' });
+      if (error) throw new Error(`job_source_records: ${error.message}`);
+      stats.records = payload.length;
+    }
+  }
+
+  // 7. eventos: sólo para las que aparecen por primera vez
+  const nuevas = plan.jobs.filter((j) => !existing.has(j.dedupe_hash));
+  stats.newJobs = nuevas.length;
+  if (nuevas.length) {
+    const { data: jobRows } = await supabase.from('jobs').select('id,dedupe_hash')
+      .in('dedupe_hash', nuevas.map((j) => j.dedupe_hash));
+    const events = (jobRows ?? []).map((r) => ({ job_id: r.id, kind: 'opened' }));
+    if (events.length) {
+      const { error } = await supabase.from('job_events').insert(events);
+      if (error) throw new Error(`job_events: ${error.message}`);
+    }
+  }
+
+  // 8. corridas por fuente
+  for (const slug of plan.sourceSlugs) {
+    const fetched = plan.records.filter((r) => r.source_slug === slug).length;
+    const { error } = await supabase.from('crawl_runs').insert({
+      source_id: srcId.get(slug), status: 'ok', fetched, kept: fetched,
+      finished_at: new Date().toISOString(),
+    });
+    if (!error) stats.runs++;
+  }
+
+  log(JSON.stringify(stats));
+  return stats;
 }
