@@ -131,7 +131,9 @@ Es la decisión central. La misma búsqueda aparece en Computrabajo, en GetOnBoa
 
 Ventaja secundaria: si mañana se cae un scraper, esa fuente se puede purgar completa sin tocar la identidad de la oferta.
 
-**Dedupe:** `jobs.dedupe_hash = sha1(company_id | title_normalizado | city | modality)`. El título normalizado es minúsculas, sin acentos, sin "ref. 21598" ni prefijos de portal. Cuando dos fuentes matchean el mismo hash, se crea **un** `jobs` y dos `job_source_records`.
+**Dedupe:** `jobs.dedupe_hash = sha1(company_slug | título_normalizado | geo_bucket)`. El título se normaliza a minúsculas sin acentos ni signos. Cuando dos fuentes matchean el mismo hash, se crea **un** `jobs` y dos `job_source_records`.
+
+**La modalidad queda afuera del hash a propósito.** El mismo aviso aparece como "remoto" en un portal y "híbrido" en otro; si la modalidad entrara en la clave, se duplicaría la oferta canónica. Se guarda la que informó la primera fuente que la vio, y si el dato importa para el reporte conviene corregirlo en `normalize.mjs`, no fragmentar la oferta.
 
 ### 2. `job_events` en vez de recalcular historia
 

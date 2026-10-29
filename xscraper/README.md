@@ -52,6 +52,27 @@ Cuando no la publica, se marca lo que corresponde y se documenta en `normalize.m
    signos). La misma búsqueda en dos portales queda una vez.
 5. **Escribir** — `data.json`, el snapshot del día y el HTML.
 
+## Ingesta a Postgres
+
+El pipeline produce ofertas normalizadas; `src/ingest.mjs` las convierte en un **plan de
+escritura** (empresas, ubicaciones, ofertas canónicas y avistamientos) sin tocar la base.
+
+```bash
+node cli.mjs --plan     # dry-run: muestra qué se escribiría
+npm test                # 10 tests de la lógica de ingesta
+```
+
+Qué resuelve el plan:
+
+- **Empresas** por slug, con sus alias por fuente (`adn-recursos-humanos`).
+- **Ubicaciones** con `country/region/city` nunca `null` — en Postgres un `UNIQUE` con `NULL`
+  no colisiona y el upsert crearía duplicados.
+- **Ofertas** deduplicadas por `dedupe_hash` (empresa + título + geo, sin modalidad).
+- **Avistamientos** uno por fuente, aunque la oferta canónica sea una sola.
+
+La escritura efectiva (upsert contra Supabase) queda pendiente de credenciales: no se
+implementó a ciegas para no entregar código sin probar contra una base real.
+
 ## Agregar una fuente
 
 1. Sumar un bloque en `src/engine.mjs` que empuje a `jobs` con los campos canónicos.

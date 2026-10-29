@@ -144,8 +144,8 @@ create table if not exists company_aliases (
 create table if not exists locations (
   id         serial primary key,
   country    char(2) not null,
-  region     text,
-  city       text,
+  region     text not null default '',   -- '' y no NULL: un UNIQUE con NULL nunca colisiona
+  city       text not null default '',
   geo_bucket text not null,
   unique (country, region, city)
 );

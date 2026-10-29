@@ -147,8 +147,8 @@ create table company_aliases (
 create table locations (
   id         serial primary key,
   country    char(2) not null,
-  region     text,
-  city       text,
+  region     text not null default '',   -- '' y no NULL: un UNIQUE con NULL nunca colisiona
+  city       text not null default '',
   geo_bucket text not null,                    -- 'AR-CABA', 'AR-GBA', 'LATAM', 'GLOBAL'
   unique (country, region, city)
 );

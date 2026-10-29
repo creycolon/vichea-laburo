@@ -6,6 +6,8 @@
   "description": "Motor de relevamiento y normalización de ofertas junior/trainee para Vichea Laburo",
   "scripts": {
     "run": "node cli.mjs",
-    "diff": "node cli.mjs --diff"
+    "diff": "node cli.mjs --diff",
+    "test": "node --test \"test/*.test.mjs\"",
+    "plan": "node cli.mjs --plan"
   }
 }
