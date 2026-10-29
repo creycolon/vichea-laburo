@@ -37,16 +37,26 @@ if (fs.existsSync(envFile)) {
   }
 }
 const TOKEN = process.env.APIFY_TOKEN;
+const query = args.find((a) => !a.startsWith('--') && !/^\d+$/.test(a));
+const dryRun = args.includes('--dry-run');
+const maxIdx = args.indexOf('--max');
+const max = maxIdx > -1 ? Number(args[maxIdx + 1]) : 100;
+const save = args.includes('--save');
+
+if (dryRun) {
+  console.log('— dry-run: no se llama a Apify —');
+  console.log('actor :', ACTOR);
+  console.log('query :', query);
+  console.log('max   :', max);
+  console.log('cuerpo:', JSON.stringify({ searchTerms: [query], maxItems: max, sort: 'Top' }, null, 2));
+  process.exit(0);
+}
+
 if (!TOKEN) {
   console.error('Falta APIFY_TOKEN. Creá tu token en https://console.apify.com/account/integrations y guardalo en prospectos/.env:');
   console.error('  APIFY_TOKEN=apify_api_...');
   process.exit(1);
 }
-
-const query = args.find((a) => !a.startsWith('--') && !/^\d+$/.test(a));
-const maxIdx = args.indexOf('--max');
-const max = maxIdx > -1 ? Number(args[maxIdx + 1]) : 100;
-const save = args.includes('--save');
 
 console.log(`buscando "${query}" (hasta ${max} tweets ≈ US$${(max * 0.0001).toFixed(2)})…`);
 const url = `https://api.apify.com/v2/acts/${ACTOR}/run-sync-get-dataset-items?token=${TOKEN}`;
