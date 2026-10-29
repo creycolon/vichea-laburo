@@ -11,7 +11,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect, url }) => {
     return redirect(`/registro?error=${encodeURIComponent('Email válido y contraseña de al menos 8 caracteres')}`);
   }
 
-  const supabase = createSupabase(cookies);
+  const supabase = createSupabase(cookies, request.headers.get('cookie'));
   if (!supabase) return redirect(`/registro?error=${encodeURIComponent('Supabase no está configurado todavía')}`);
 
   const site = import.meta.env.PUBLIC_SITE_URL ?? url.origin;

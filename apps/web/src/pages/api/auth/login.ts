@@ -9,7 +9,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
   if (!email || !password) return redirect(`/login?error=${encodeURIComponent('Completá email y contraseña')}`);
 
-  const supabase = createSupabase(cookies);
+  const supabase = createSupabase(cookies, request.headers.get('cookie'));
   if (!supabase) return redirect(`/login?error=${encodeURIComponent('Supabase no está configurado: faltan SUPABASE_URL y SUPABASE_ANON_KEY')}`);
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });

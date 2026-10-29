@@ -4,7 +4,7 @@ import { getUser, demoEnabled } from './lib/supabase';
 const PROTECTED = ['/panel', '/busquedas'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  const { user, configured } = await getUser(context.cookies);
+  const { user, configured } = await getUser(context.cookies, context.request.headers.get('cookie'));
 
   // Modo demostración: exige un opt-in explícito (PUBLIC_DEMO=1 o DEV_DEMO=1) y que
   // Supabase NO esté configurado. Sirve para mostrar el producto sin backend.

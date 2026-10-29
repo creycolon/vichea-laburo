@@ -7,7 +7,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const role = String(form.get('role') ?? '');
   if (!email.includes('@')) return redirect('/?alta=error#alta');
 
-  const supabase = createSupabase(cookies);
+  const supabase = createSupabase(cookies, request.headers.get('cookie'));
   if (!supabase) return redirect('/?alta=demo#alta');
 
   const { error } = await supabase.from('waitlist').insert({ email, role_hint: role, source: 'landing' });

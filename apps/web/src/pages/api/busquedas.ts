@@ -12,7 +12,7 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
     return new Response(JSON.stringify({ error: 'nombre y filtros son obligatorios' }), { status: 400 });
   }
 
-  const supabase = createSupabase(cookies);
+  const supabase = createSupabase(cookies, request.headers.get('cookie'));
   if (!supabase) return new Response(JSON.stringify({ error: 'supabase no configurado' }), { status: 503 });
 
   const orgId = await currentOrgId(supabase);

@@ -4,7 +4,7 @@ import { createSupabase } from '../../../lib/supabase';
 export const POST: APIRoute = async ({ request, cookies, redirect, url }) => {
   const form = await request.formData();
   const email = String(form.get('email') ?? '').trim();
-  const supabase = createSupabase(cookies);
+  const supabase = createSupabase(cookies, request.headers.get('cookie'));
   if (!supabase) return redirect(`/recuperar?error=${encodeURIComponent('Supabase no está configurado todavía')}`);
 
   const site = import.meta.env.PUBLIC_SITE_URL ?? url.origin;
