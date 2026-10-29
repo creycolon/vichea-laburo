@@ -154,7 +154,7 @@ const demo = Astro.locals.demo;
             </p>
           </div>
           {alta === 'ok' && <div class="alert ok" style="grid-column:1/-1;margin:0">Listo, quedaste anotado. Te escribimos cuando haya novedades.</div>}
-          {alta === 'demo' && <div class="alert warn" style="grid-column:1/-1;margin:0">Supabase no está configurado: el formulario no puede guardar todavía.</div>}
+          {alta === 'demo' && <div class="alert warn" style="grid-column:1/-1;margin:0">Todavía no estamos guardando suscripciones desde la web. Escribinos y te sumamos a la lista.</div>}
           {alta === 'error' && <div class="alert err" style="grid-column:1/-1;margin:0">No pudimos guardar tu email. Probá de nuevo en un rato.</div>}
           <form class="form" method="post" action="/api/waitlist" style="grid-column:2">
             <label for="email">Email</label>

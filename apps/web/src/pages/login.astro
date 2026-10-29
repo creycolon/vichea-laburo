@@ -5,6 +5,7 @@ const ok = Astro.url.searchParams.get('ok');
 const next = Astro.url.searchParams.get('next') ?? '/panel';
 const configured = Astro.locals.configured;
 const demo = Astro.locals.demo;
+const dev = import.meta.env.DEV;
 ---
 <Layout title="Ingresar — Vichea Laburo">
   <main class="auth">
@@ -20,8 +21,9 @@ const demo = Astro.locals.demo;
           </div>
         ) : !configured && (
           <div class="alert warn">
-            Supabase no está configurado. Copiá <code>.env.example</code> a <code>.env</code>,
-            pegá <code>SUPABASE_URL</code> y <code>SUPABASE_ANON_KEY</code>, y reiniciá el servidor.
+            {dev
+              ? 'Supabase no está configurado: copiá .env.example a .env y cargá SUPABASE_URL y SUPABASE_ANON_KEY.'
+              : 'El ingreso todavía no está habilitado. Estamos terminando de conectar el servicio.'}
           </div>
         )}
         {err && <div class="alert err">{err}</div>}

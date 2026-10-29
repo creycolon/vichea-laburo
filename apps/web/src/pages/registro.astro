@@ -4,6 +4,7 @@ const err = Astro.url.searchParams.get('error');
 const ok = Astro.url.searchParams.get('ok');
 const configured = Astro.locals.configured;
 const demo = Astro.locals.demo;
+const dev = import.meta.env.DEV;
 ---
 <Layout title="Crear cuenta — Vichea Laburo">
   <main class="auth">
@@ -19,7 +20,9 @@ const demo = Astro.locals.demo;
           </div>
         ) : !configured && (
           <div class="alert warn">
-            Supabase no está configurado: el formulario valida pero no puede crear la cuenta todavía.
+            {dev
+              ? 'Supabase no está configurado: copiá .env.example a .env y cargá las claves.'
+              : 'El registro todavía no está habilitado. Estamos terminando de conectar el servicio.'}
           </div>
         )}
         {err && <div class="alert err">{err}</div>}
