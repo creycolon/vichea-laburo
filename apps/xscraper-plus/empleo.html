@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XScraper+ · empleo (edición personal)</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #0e1116; --panel: #161b22; --panel2: #1c232d; --line: #2a3441;
+    --txt: #dce3ec; --dim: #8b98a9; --acc: #4da3ff; --acc2: #9d7bff;
+    --a: #35c17d; --b: #7ec8f2; --c: #f0c060; --d: #9aa7b6; --s: #ff6b72;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt);
+    font: 14px/1.5 ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--acc); }
+  header { padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
+    display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0; }
+  header .meta { color: var(--dim); font-size: 12px; }
+  button, select, input { font: inherit; color: inherit; background: var(--panel2);
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--acc); color: #fff; }
+  input[type=text], input[type=search], input[type=number], textarea { width: 100%; }
+  textarea { min-height: 72px; resize: vertical; line-height: 1.4; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .layout { display: grid; grid-template-columns: 300px 1fr; gap: 0; align-items: start; }
+  aside { border-right: 1px solid var(--line); padding: 14px; position: sticky; top: 0;
+    max-height: 100vh; overflow: auto; background: #12171e; }
+  aside h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--dim);
+    margin: 16px 0 6px; }
+  aside h2:first-child { margin-top: 0; }
+  .field { margin-bottom: 8px; }
+  .field > label { display: block; font-size: 11px; color: var(--dim); margin-bottom: 3px; }
+  .row { display: flex; gap: 6px; align-items: center; }
+  .checks { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip { border: 1px solid var(--line); background: var(--panel2); border-radius: 999px;
+    padding: 2px 9px; font-size: 12px; cursor: pointer; user-select: none; }
+  .chip:hover { border-color: var(--acc); }
+  .chip.on { background: #1d3a5c; border-color: var(--acc); color: #cfe6ff; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chips .chip .n { color: var(--dim); font-size: 11px; margin-left: 4px; }
+  main { padding: 14px 18px 60px; min-width: 0; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(126px, 1fr)); gap: 10px;
+    margin-bottom: 14px; }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px; }
+  .kpi .v { font-size: 20px; font-weight: 650; }
+  .kpi .l { font-size: 11px; color: var(--dim); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    white-space: nowrap; position: sticky; top: 0; background: var(--panel); }
+  th.n, td.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: #1a2129; cursor: pointer; }
+  .badge { display: inline-block; min-width: 28px; text-align: center; border-radius: 5px;
+    font-weight: 700; font-size: 12px; padding: 1px 6px; color: #0e1116; background: var(--d); }
+  .badge.hi { background: var(--a); }
+  .badge.mid { background: var(--b); }
+  .badge.low { background: var(--c); }
+  .badge.none { background: #39424e; color: var(--dim); }
+  .tablewrap { overflow-x: auto; }
+  .jobtitle { font-weight: 600; max-width: 430px; }
+  .muted { color: var(--dim); font-size: 12px; }
+  .loc { max-width: 170px; }
+  .salary { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .date { white-space: nowrap; color: var(--dim); font-size: 12px; }
+  .net { font-size: 11px; border-radius: 4px; padding: 0 5px; background: #1d2a3a;
+    border: 1px solid #2f4661; color: #9fc7ff; white-space: nowrap; }
+  .net.infojobs { background: #3a1f24; border-color: #6b3039; color: #ff9aa2; }
+  .net.adzuna { background: #2a2440; border-color: #42386a; color: #cbb8ff; }
+  .net.remoteok { background: #1e3326; border-color: #315a3f; color: #a4d6a4; }
+  .net.remotive { background: #16303a; border-color: #2c6b7a; color: #9fe3f0; }
+  .net.arbeitnow { background: #3a2a16; border-color: #6b4c25; color: #ffbe7a; }
+  .net.jobicy { background: #3a1f2c; border-color: #6b3050; color: #ffa8cf; }
+  .net.hackernews { background: #3a2a16; border-color: #6b4c25; color: #ffbe7a; }
+  .market { font-size: 11px; border-radius: 999px; padding: 1px 8px; border: 1px solid var(--line); white-space: nowrap; }
+  .market.es { background: #3a1f24; border-color: #6b3039; color: #ffb3bd; }
+  .market.eu { background: #1d2a3a; border-color: #2f4661; color: #9fc7ff; }
+  .market.global { background: #23331f; border-color: #37502f; color: #b7e0a4; }
+  .tag { font-size: 11px; border-radius: 999px; padding: 1px 8px; border: 1px solid var(--line); }
+  .tag.guardada { background: #1f3b2a; border-color: var(--a); color: #b7e0a4; }
+  .tag.aplicada { background: #1d3a5c; border-color: var(--acc); color: #cfe6ff; }
+  .tag.descartada { background: #402026; border-color: var(--s); color: #ffb3bd; }
+  .drawer { position: fixed; right: 0; top: 0; bottom: 0; width: min(620px, 94vw); background: var(--panel);
+    border-left: 1px solid var(--line); padding: 16px; overflow: auto; transform: translateX(100%);
+    transition: transform .18s ease; z-index: 50; box-shadow: -14px 0 40px rgba(0,0,0,.5); }
+  .drawer.open { transform: none; }
+  .drawer h3 { margin: 0 34px 2px 0; font-size: 17px; }
+  .drawer h4 { margin: 16px 0 6px; font-size: 12px; color: var(--dim); text-transform: uppercase; }
+  .close { position: absolute; right: 12px; top: 10px; }
+  .desc { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 11px; white-space: pre-wrap; word-break: break-word; max-height: 340px; overflow: auto; font-size: 13px; }
+  .profilebox { background: var(--panel2); border: 1px solid var(--line); border-radius: 9px; padding: 9px; }
+  .profilebox .field:last-child { margin-bottom: 0; }
+  .empty { padding: 34px 20px; text-align: center; color: var(--dim); }
+  .empty code { display: inline-block; margin: 3px; padding: 4px 7px; background: var(--panel2);
+    border: 1px solid var(--line); border-radius: 5px; color: var(--txt); }
+  .warn { background: #3a2a16; border: 1px solid #6b4c25; color: #ffd8a3; border-radius: 7px;
+    padding: 8px 10px; margin-bottom: 12px; font-size: 12px; }
+  .drawer .actions { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0; }
+  .drawer .actions button.on { background: #1d3a5c; border-color: var(--acc); color: #cfe6ff; }
+  .kv { display: grid; grid-template-columns: 120px 1fr; gap: 4px 10px; font-size: 13px; }
+  .kv .k { color: var(--dim); }
+  .reasons { margin: 0; padding-left: 18px; font-size: 13px; }
+  .reasons li { margin-bottom: 3px; }
+  .gaps { color: #ffc38a; }
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>XScraper · empleo</h1>
+  <div class="meta" id="meta"></div>
+  <div class="row" style="margin-left:auto">
+    <a href="index.html">← Radar de oportunidades</a>
+    <button id="btnCsv">Exportar CSV</button>
+    <button id="btnReset">Reiniciar filtros</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <h2>Perfil laboral</h2>
+    <div class="profilebox">
+      <div class="field">
+        <label for="lpTitles">Puestos o familias que buscas</label>
+        <textarea id="lpTitles" rows="3" placeholder="Ej.: automation engineer, operations, n8n, soporte técnico"></textarea>
+      </div>
+      <div class="field">
+        <label>Habilidades</label>
+        <div class="checks" id="lpSkills"></div>
+      </div>
+      <div class="field">
+        <label for="lpSeniority">Seniority</label>
+        <select id="lpSeniority"></select>
+      </div>
+      <div class="field row">
+        <div style="flex:1">
+          <label for="lpSalary">Salario anual mínimo</label>
+          <input type="number" id="lpSalary" min="0" step="1000" placeholder="30000">
+        </div>
+        <div style="width:82px">
+          <label for="lpCurrency">Moneda</label>
+          <select id="lpCurrency">
+            <option>EUR</option><option>USD</option><option>GBP</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="lpLocation">Ubicación</label>
+        <input type="text" id="lpLocation" placeholder="Madrid, España, Europa…">
+      </div>
+      <div class="field">
+        <label for="lpRemote">Modalidad</label>
+        <select id="lpRemote"></select>
+      </div>
+      <div class="field row">
+        <button id="lpClear">Limpiar perfil</button>
+        <span class="muted" id="lpState">sin perfil</span>
+      </div>
+      <div class="muted" id="lpHint">Se guarda solo en este navegador y no sale del equipo.</div>
+    </div>
+
+    <h2>Búsqueda</h2>
+    <div class="field">
+      <input type="search" id="q" placeholder="puesto, empresa, tecnología…">
+    </div>
+
+    <h2>Mercado</h2>
+    <div class="field checks" id="marketBtns"></div>
+
+    <h2>Fuente</h2>
+    <div class="field checks" id="sourceBtns"></div>
+
+    <h2>Publicación</h2>
+    <div class="field checks" id="dayBtns"></div>
+
+    <h2>Opciones</h2>
+    <div class="field checks" id="optBtns"></div>
+
+    <h2>Estado</h2>
+    <div class="field checks" id="statusBtns"></div>
+
+    <h2>Orden</h2>
+    <div class="field">
+      <select id="sortBy" style="width:100%">
+        <option value="auto">Automático (afinidad si hay perfil)</option>
+        <option value="fit">Afinidad</option>
+        <option value="relevance">Relevancia de la búsqueda</option>
+        <option value="date">Fecha</option>
+        <option value="salary">Salario (EUR aprox.)</option>
+      </select>
+    </div>
+    <div class="muted" id="count"></div>
+  </aside>
+
+  <main>
+    <div class="kpis" id="kpis"></div>
+    <div id="warn"></div>
+    <div class="tablewrap" id="view"></div>
+  </main>
+</div>
+
+<div class="drawer" id="drawer"></div>
+
+<script src="perfil_laboral.js"></script>
+<script src="empleo_datos.js"></script>
+<script>
+const E = window.EMPLEO || { ofertas: [], by_market: {}, by_source: {}, errors: [], count: 0 };
+const JOBS = Array.isArray(E.ofertas) ? E.ofertas : [];
+const P = window.PerfilLaboral;
+const $ = (s) => document.querySelector(s);
+
+const PROFILE_KEY = "xscraper.empleo.perfil.v1";
+const BOX_KEY = "xscraper.empleo.bandeja.v1";
+const MARKET_LABEL = { es: "España", eu: "Europa", global: "Global" };
+
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[c]);
+}
+
+function read(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch { return fallback; }
+}
+
+function write(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* modo privado */ }
+}
+
+let profile = Object.assign({
+  titles: "", skills: [], seniority: "any", salaryMin: 0,
+  currency: "EUR", location: "", remote: "any"
+}, read(PROFILE_KEY, {}));
+profile.skills = Array.isArray(profile.skills) ? profile.skills : [];
+let box = read(BOX_KEY, {});
+if (!box || typeof box !== "object" || Array.isArray(box)) box = {};
+
+const state = {
+  q: "", market: "all", sources: new Set(), days: "all",
+  remoteOnly: false, salaryOnly: false, status: "all", sort: "auto"
+};
+
+function saveProfile() { write(PROFILE_KEY, profile); }
+function saveBox() { write(BOX_KEY, box); }
+
+function fitClass(fit) {
+  if (fit == null) return "none";
+  if (fit >= 70) return "hi";
+  if (fit >= 50) return "mid";
+  if (fit >= 30) return "low";
+  return "none";
+}
+
+function money(job) {
+  const min = Number(job.salary_min) || 0;
+  const max = Number(job.salary_max) || 0;
+  if (!min && !max) return "—";
+  const currency = String(job.currency || "EUR").toUpperCase();
+  const fmt = (n) => {
+    try {
+      return new Intl.NumberFormat("es-ES", {
+        style: "currency", currency, maximumFractionDigits: 0
+      }).format(n);
+    } catch { return `${Math.round(n)} ${currency}`; }
+  };
+  const body = min && max && min !== max ? `${fmt(min)}–${fmt(max)}` : fmt(max || min);
+  return job.salary_approx ? `≈ ${body}` : body;
+}
+
+function ageText(job) {
+  const age = Number(job.age_days);
+  if (!Number.isFinite(age)) return "—";
+  if (age <= 0) return "hoy";
+  if (age === 1) return "ayer";
+  if (age < 30) return `hace ${age} d`;
+  if (age < 365) return `hace ${Math.round(age / 30)} meses`;
+  return `hace ${Math.round(age / 365)} años`;
+}
+
+function statusOf(id) { return box[id] || ""; }
+
+function haystack(job) {
+  return P.norm([
+    job.title, job.company, job.location, job.description, job.contract, job.seniority,
+    ...(job.skills || []), ...(job.tags || []), ...(job.queries || [])
+  ].join(" "));
+}
+
+function filtered() {
+  const terms = P.tokens(state.q);
+  const list = [];
+  for (const job of JOBS) {
+    if (state.market !== "all" && job.market_group !== state.market) continue;
+    if (state.sources.size && !state.sources.has(job.source)) continue;
+    if (state.remoteOnly && !job.remote) continue;
+    if (state.salaryOnly && !job.salary_eur) continue;
+    if (state.days !== "all") {
+      const age = Number(job.age_days);
+      if (!Number.isFinite(age) || age > Number(state.days)) continue;
+    }
+    const status = statusOf(job.id);
+    if (state.status !== "all" && status !== state.status) continue;
+    if (terms.length) {
+      const hay = haystack(job);
+      if (!terms.every((t) => hay.includes(t))) continue;
+    }
+    list.push(job);
+  }
+  return list;
+}
+
+function evaluate(job) {
+  const result = P.evaluate(job, profile);
+  return { job, ...result };
+}
+
+function sorted(list) {
+  const rows = list.map(evaluate);
+  const mode = state.sort === "auto"
+    ? (P.isActive(profile) ? "fit" : "relevance")
+    : state.sort;
+  rows.sort((a, b) => {
+    if (mode === "fit") {
+      const d = (b.fit ?? -1) - (a.fit ?? -1);
+      if (d) return d;
+    } else if (mode === "relevance") {
+      const d = (b.job.relevance || 0) - (a.job.relevance || 0);
+      if (d) return d;
+    } else if (mode === "salary") {
+      const d = (b.job.salary_eur || -1) - (a.job.salary_eur || -1);
+      if (d) return d;
+    }
+    const date = String(b.job.posted_at || "").localeCompare(String(a.job.posted_at || ""));
+    if (date) return date;
+    return (b.job.relevance || 0) - (a.job.relevance || 0);
+  });
+  return rows;
+}
+
+/* ---------- perfil laboral ---------- */
+function updateProfileState() {
+  const summary = P.resumen(profile);
+  $("#lpState").textContent = !summary.active ? "sin perfil"
+    : summary.generic ? "perfil incompleto" : "perfil activo";
+  $("#lpHint").textContent = summary.active
+    ? "La afinidad es una heurística transparente; revisa siempre la oferta."
+    : "Añade puesto, habilidades, ubicación o salario para activar la afinidad.";
+}
+
+function renderProfile() {
+  $("#lpTitles").value = profile.titles || "";
+  $("#lpSalary").value = profile.salaryMin || "";
+  $("#lpCurrency").value = profile.currency || "EUR";
+  $("#lpLocation").value = profile.location || "";
+  $("#lpSeniority").innerHTML = P.SENIORITY.map((o) =>
+    `<option value="${o.id}"${profile.seniority === o.id ? " selected" : ""}>${esc(o.label)}</option>`
+  ).join("");
+  $("#lpRemote").innerHTML = P.REMOTE.map((o) =>
+    `<option value="${o.id}"${profile.remote === o.id ? " selected" : ""}>${esc(o.label)}</option>`
+  ).join("");
+  $("#lpSkills").innerHTML = P.SKILLS.map((s) => {
+    const on = profile.skills.includes(s.id);
+    return `<span class="chip${on ? " on" : ""}" data-skill="${s.id}">${esc(s.label)}</span>`;
+  }).join("");
+  updateProfileState();
+}
+
+function bindProfile() {
+  $("#lpTitles").addEventListener("input", (e) => {
+    profile.titles = e.target.value;
+    saveProfile(); updateProfileState(); render();
+  });
+  $("#lpLocation").addEventListener("input", (e) => {
+    profile.location = e.target.value;
+    saveProfile(); updateProfileState(); render();
+  });
+  $("#lpSalary").addEventListener("input", (e) => {
+    profile.salaryMin = Math.max(0, Number(e.target.value) || 0);
+    saveProfile(); updateProfileState(); render();
+  });
+  $("#lpCurrency").addEventListener("change", (e) => {
+    profile.currency = e.target.value;
+    saveProfile(); render();
+  });
+  $("#lpSeniority").addEventListener("change", (e) => {
+    profile.seniority = e.target.value;
+    saveProfile(); render();
+  });
+  $("#lpRemote").addEventListener("change", (e) => {
+    profile.remote = e.target.value;
+    saveProfile(); render();
+  });
+  $("#lpSkills").addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-skill]");
+    if (!chip) return;
+    const id = chip.dataset.skill;
+    profile.skills = profile.skills.includes(id)
+      ? profile.skills.filter((s) => s !== id)
+      : [...profile.skills, id];
+    saveProfile(); renderProfile(); render();
+  });
+  $("#lpClear").addEventListener("click", () => {
+    profile = { titles: "", skills: [], seniority: "any", salaryMin: 0,
+      currency: "EUR", location: "", remote: "any" };
+    saveProfile(); renderProfile(); render();
+  });
+}
+
+/* ---------- filtros ---------- */
+function renderFilters() {
+  const markets = [
+    ["all", "Todos", JOBS.length],
+    ["es", "España", JOBS.filter((j) => j.market_group === "es").length],
+    ["eu", "Europa", JOBS.filter((j) => j.market_group === "eu").length],
+    ["global", "Global", JOBS.filter((j) => j.market_group === "global").length]
+  ];
+  $("#marketBtns").innerHTML = markets.map(([id, label, n]) =>
+    `<span class="chip${state.market === id ? " on" : ""}" data-market="${id}">${label}<span class="n">${n}</span></span>`
+  ).join("");
+
+  const sources = Object.entries(E.by_source || {}).sort((a, b) => b[1] - a[1]);
+  $("#sourceBtns").innerHTML = sources.map(([id, n]) =>
+    `<span class="chip${state.sources.has(id) ? " on" : ""}" data-source="${esc(id)}">${esc(id)}<span class="n">${n}</span></span>`
+  ).join("") || '<span class="muted">sin fuentes</span>';
+
+  const days = [["7", "7 días"], ["14", "14 días"], ["30", "30 días"], ["all", "Todo"]];
+  $("#dayBtns").innerHTML = days.map(([id, label]) =>
+    `<span class="chip${state.days === id ? " on" : ""}" data-days="${id}">${label}</span>`
+  ).join("");
+
+  $("#optBtns").innerHTML = `
+    <span class="chip${state.remoteOnly ? " on" : ""}" data-opt="remote">Solo remoto</span>
+    <span class="chip${state.salaryOnly ? " on" : ""}" data-opt="salary">Con salario</span>`;
+
+  const status = [["all", "Todas"], ["guardada", "Guardadas"], ["aplicada", "Aplicadas"], ["descartada", "Descartadas"]];
+  $("#statusBtns").innerHTML = status.map(([id, label]) =>
+    `<span class="chip${state.status === id ? " on" : ""}" data-status="${id}">${label}</span>`
+  ).join("");
+}
+
+function bindFilters() {
+  $("#q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+  $("#marketBtns").addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-market]");
+    if (!chip) return;
+    state.market = chip.dataset.market;
+    renderFilters(); render();
+  });
+  $("#sourceBtns").addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-source]");
+    if (!chip) return;
+    const id = chip.dataset.source;
+    if (state.sources.has(id)) state.sources.delete(id); else state.sources.add(id);
+    renderFilters(); render();
+  });
+  $("#dayBtns").addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-days]");
+    if (!chip) return;
+    state.days = chip.dataset.days;
+    renderFilters(); render();
+  });
+  $("#optBtns").addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-opt]");
+    if (!chip) return;
+    if (chip.dataset.opt === "remote") state.remoteOnly = !state.remoteOnly;
+    if (chip.dataset.opt === "salary") state.salaryOnly = !state.salaryOnly;
+    renderFilters(); render();
+  });
+  $("#statusBtns").addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-status]");
+    if (!chip) return;
+    state.status = chip.dataset.status;
+    renderFilters(); render();
+  });
+  $("#sortBy").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
+  $("#btnReset").addEventListener("click", () => {
+    state.q = ""; state.market = "all"; state.sources = new Set(); state.days = "all";
+    state.remoteOnly = false; state.salaryOnly = false; state.status = "all"; state.sort = "auto";
+    $("#q").value = ""; $("#sortBy").value = "auto";
+    renderFilters(); render();
+  });
+}
+
+/* ---------- vista ---------- */
+function renderKpis(rows) {
+  const active = P.isActive(profile);
+  const high = rows.filter((r) => (r.fit ?? 0) >= 60).length;
+  const fresh = rows.filter((r) => Number(r.job.age_days) <= 7).length;
+  const remote = rows.filter((r) => r.job.remote).length;
+  const salary = rows.filter((r) => r.job.salary_eur).length;
+  const items = [
+    [`${rows.length}/${JOBS.length}`, "ofertas filtradas"],
+    [String(fresh), "publicadas ≤7 días"],
+    [String(remote), "remotas"],
+    [String(salary), "con salario"],
+    active ? [String(high), "afinidad ≥60"] : [String(Object.keys(E.by_source || {}).length), "fuentes"]
+  ];
+  $("#kpis").innerHTML = items.map(([v, l]) =>
+    `<div class="kpi"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`
+  ).join("");
+}
+
+function renderWarnings() {
+  const errors = Array.isArray(E.errors) ? E.errors : [];
+  $("#warn").innerHTML = errors.length
+    ? `<div class="warn"><b>Fuentes con aviso:</b> ${errors.map(esc).join(" · ")}</div>`
+    : "";
+}
+
+function renderTable(rows) {
+  if (!JOBS.length) {
+    $("#view").innerHTML = `<div class="empty">
+      <p>Todavía no hay ofertas. Ejecuta una búsqueda y reconstruye:</p>
+      <p><code>.venv/bin/python pruebas/consultar_empleo.py --q "automation" --ejecutar</code></p>
+      <p><code>.venv/bin/python web/construir_empleo.py</code></p>
+      <p class="muted">Para España añade credenciales de InfoJobs o Adzuna; para remoto global funcionan Remotive, RemoteOK, Arbeitnow, Jobicy y HN.</p>
+    </div>`;
+    return;
+  }
+  if (!rows.length) {
+    $("#view").innerHTML = `<div class="empty">No hay ofertas con estos filtros. <button id="clearFilters">Limpiar filtros</button></div>`;
+    $("#clearFilters").addEventListener("click", () => $("#btnReset").click());
+    return;
+  }
+  const active = P.isActive(profile);
+  const head = active
+    ? `<th class="n">Afinidad</th><th>Puesto</th><th>Mercado</th><th>Ubicación</th><th>Salario</th><th>Fuente</th><th>Publicada</th><th>Estado</th>`
+    : `<th class="n">Rel.</th><th>Puesto</th><th>Mercado</th><th>Ubicación</th><th>Salario</th><th>Fuente</th><th>Publicada</th><th>Estado</th>`;
+  const body = rows.map((r) => {
+    const job = r.job;
+    const status = statusOf(job.id);
+    const tag = status ? `<span class="tag ${status}">${status}</span>` : '<span class="muted">—</span>';
+    const first = active
+      ? `<span class="badge ${fitClass(r.fit)}">${r.fit ?? "—"}</span>`
+      : `<span class="badge none" title="Relevancia de la consulta">${job.relevance ?? "—"}</span>`;
+    return `<tr data-id="${esc(job.id)}">
+      <td class="n">${first}</td>
+      <td><div class="jobtitle">${esc(job.title)}</div><div class="muted">${esc(job.company || "—")}</div></td>
+      <td><span class="market ${esc(job.market_group)}">${esc(MARKET_LABEL[job.market_group] || job.market_group)}</span></td>
+      <td class="loc">${esc(job.location || "—")}${job.remote ? ' <span class="muted">· remoto</span>' : ""}</td>
+      <td class="salary">${esc(money(job))}</td>
+      <td><span class="net ${esc(job.source)}">${esc(job.source)}</span></td>
+      <td class="date">${esc(ageText(job))}</td>
+      <td>${tag}</td>
+    </tr>`;
+  }).join("");
+  $("#view").innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  $("#view").querySelectorAll("tbody tr").forEach((tr) => {
+    tr.addEventListener("click", () => openDrawer(tr.dataset.id));
+  });
+}
+
+function render() {
+  const rows = sorted(filtered());
+  renderKpis(rows);
+  renderTable(rows);
+  $("#count").textContent = `${rows.length} de ${JOBS.length} ofertas`;
+  if (P.isActive(profile)) $("#sortBy").value = state.sort;
+}
+
+/* ---------- drawer ---------- */
+function openDrawer(id) {
+  const job = JOBS.find((j) => j.id === id);
+  if (!job) return;
+  const r = evaluate(job);
+  const status = statusOf(job.id);
+  const active = P.isActive(profile);
+  const reasons = r.reasons.length
+    ? `<ul class="reasons">${r.reasons.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`
+    : '<span class="muted">Sin perfil activo: no hay afinidad calculada.</span>';
+  const gaps = r.gaps.length
+    ? `<ul class="reasons gaps">${r.gaps.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`
+    : "";
+  const skills = [...new Set([...(job.skills || []), ...(job.tags || [])])];
+  $("#drawer").innerHTML = `
+    <button class="close" id="drawerClose">Cerrar</button>
+    <h3>${esc(job.title)}</h3>
+    <div class="muted">${esc(job.company || "—")} · <span class="net ${esc(job.source)}">${esc(job.source)}</span></div>
+    <div class="actions">
+      <button data-box="guardada" class="${status === "guardada" ? "on" : ""}">Guardar</button>
+      <button data-box="aplicada" class="${status === "aplicada" ? "on" : ""}">Marcar aplicada</button>
+      <button data-box="descartada" class="${status === "descartada" ? "on" : ""}">Descartar</button>
+      ${status ? '<button data-box="">Quitar estado</button>' : ""}
+      ${job.url ? `<a href="${esc(job.url)}" target="_blank" rel="noopener noreferrer"><button>Abrir oferta ↗</button></a>` : ""}
+    </div>
+    ${active ? `<h4>Afinidad con tu perfil · ${r.fit}/100</h4>${reasons}${gaps}` : "<h4>Afinidad</h4>" + reasons}
+    <h4>Datos</h4>
+    <div class="kv">
+      <span class="k">Mercado</span><span>${esc(MARKET_LABEL[job.market_group] || job.market_group)}</span>
+      <span class="k">Ubicación</span><span>${esc(job.location || "—")}</span>
+      <span class="k">Modalidad</span><span>${job.remote ? "Remoto" : "No indicado / presencial"}</span>
+      <span class="k">Salario</span><span>${esc(money(job))}${job.salary_eur ? ` · ≈ ${Math.round(job.salary_eur).toLocaleString("es-ES")}${job.salary_eur_max && job.salary_eur_max !== job.salary_eur ? "–" + Math.round(job.salary_eur_max).toLocaleString("es-ES") : ""} EUR/año` : ""}</span>
+      <span class="k">Publicada</span><span>${esc(job.posted_at ? String(job.posted_at).slice(0, 10) : "—")} (${esc(ageText(job))})</span>
+      <span class="k">Contrato</span><span>${esc(job.contract || "—")}</span>
+      <span class="k">Seniority</span><span>${esc(job.seniority || "—")}</span>
+      <span class="k">Consultas</span><span>${esc((job.queries || []).join(", ") || job.query || "—")}</span>
+    </div>
+    <h4>Descripción</h4>
+    <div class="desc">${esc(job.description || "Sin descripción.")}</div>
+    ${skills.length ? `<h4>Habilidades y etiquetas</h4><div class="chips">${skills.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div>` : ""}
+    <p class="muted" style="margin-top:16px">La candidatura es manual. XScraper no envía CVs ni correos.</p>
+  `;
+  $("#drawer").classList.add("open");
+  $("#drawerClose").addEventListener("click", closeDrawer);
+  $("#drawer").querySelectorAll("[data-box]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const value = btn.dataset.box;
+      if (value) box[job.id] = value; else delete box[job.id];
+      saveBox(); openDrawer(job.id); render();
+    });
+  });
+}
+
+function closeDrawer() { $("#drawer").classList.remove("open"); }
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+
+/* ---------- CSV ---------- */
+function csvCell(value) {
+  const text = String(value ?? "");
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function exportCsv() {
+  const rows = sorted(filtered());
+  const head = ["fit", "relevance", "title", "company", "market", "location", "remote",
+    "salary_min", "salary_max", "currency", "salary_eur", "source", "posted_at", "status",
+    "reasons", "gaps", "url"];
+  const lines = [head.join(",")];
+  for (const r of rows) {
+    const j = r.job;
+    lines.push([
+      r.fit ?? "", j.relevance ?? "", j.title, j.company, MARKET_LABEL[j.market_group] || j.market_group,
+      j.location, j.remote ? "sí" : "no", j.salary_min ?? "", j.salary_max ?? "", j.currency,
+      j.salary_eur ?? "", j.source, j.posted_at || "", statusOf(j.id) || "",
+      r.reasons.join("; "), r.gaps.join("; "), j.url
+    ].map(csvCell).join(","));
+  }
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `xscraper-empleo-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ---------- arranque ---------- */
+$("#meta").textContent = `${E.count || JOBS.length} ofertas · ${E.by_market?.es || 0} España · ${E.by_market?.eu || 0} Europa · ${E.by_market?.global || 0} global · ${E.built_at || "sin construir"}`;
+bindProfile();
+bindFilters();
+renderProfile();
+renderFilters();
+renderWarnings();
+render();
+$("#btnCsv").addEventListener("click", exportCsv);
+</script>
+</body>
+</html>

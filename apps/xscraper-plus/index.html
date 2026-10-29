@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XScraper+ · radar de oportunidades (edición personal)</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #0e1116; --panel: #161b22; --panel2: #1c232d; --line: #2a3441;
+    --txt: #dce3ec; --dim: #8b98a9; --acc: #4da3ff; --acc2: #9d7bff;
+    --a: #35c17d; --b: #7ec8f2; --c: #f0c060; --d: #9aa7b6; --s: #ff6b72;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt);
+    font: 14px/1.5 ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
+    display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0; }
+  header .meta { color: var(--dim); font-size: 12px; }
+  button, select, input { font: inherit; color: inherit; background: var(--panel2);
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--acc); color: #fff; }
+  input[type=text], input[type=search], textarea { width: 100%; }
+  textarea { min-height: 74px; resize: vertical; line-height: 1.4; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .layout { display: grid; grid-template-columns: 292px 1fr; gap: 0; align-items: start; }
+  aside { border-right: 1px solid var(--line); padding: 14px; position: sticky; top: 0;
+    max-height: 100vh; overflow: auto; background: #12171e; }
+  aside h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--dim);
+    margin: 16px 0 6px; }
+  aside h2:first-child { margin-top: 0; }
+  .field { margin-bottom: 8px; }
+  .field > label { display: block; font-size: 11px; color: var(--dim); margin-bottom: 3px; }
+  .row { display: flex; gap: 6px; align-items: center; }
+  .checks { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip { border: 1px solid var(--line); background: var(--panel2); border-radius: 999px;
+    padding: 2px 9px; font-size: 12px; cursor: pointer; user-select: none; }
+  .chip:hover { border-color: var(--acc); }
+  .chip.on { background: #1d3a5c; border-color: var(--acc); color: #cfe6ff; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chips .chip .n { color: var(--dim); font-size: 11px; margin-left: 4px; }
+  main { padding: 14px 18px 60px; min-width: 0; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(126px, 1fr)); gap: 10px;
+    margin-bottom: 14px; }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px; }
+  .kpi .v { font-size: 20px; font-weight: 650; }
+  .kpi .l { font-size: 11px; color: var(--dim); }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 14px;
+    flex-wrap: wrap; }
+  .tab { padding: 7px 13px; border: 1px solid transparent; border-bottom: 0; border-radius: 7px 7px 0 0;
+    cursor: pointer; color: var(--dim); }
+  .tab.on { background: var(--panel); border-color: var(--line); color: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    cursor: pointer; white-space: nowrap; position: sticky; top: 0; background: var(--panel); }
+  th.n, td.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: #1a2129; cursor: pointer; }
+  .badge { display: inline-block; min-width: 20px; text-align: center; border-radius: 5px;
+    font-weight: 700; font-size: 12px; padding: 1px 6px; color: #0e1116; }
+  .A { background: var(--a); } .B { background: var(--b); } .C { background: var(--c); }
+  .D { background: var(--d); } .S { background: var(--s); }
+  .txt { max-width: 500px; }
+  .tablewrap { overflow-x: auto; }
+  @media (max-width: 1500px) { .hide-sm { display: none; } }
+  .who { color: var(--dim); font-size: 12px; white-space: nowrap; }
+  .who a { color: var(--acc); text-decoration: none; }
+  .who.author { max-width: 168px; overflow: hidden; text-overflow: ellipsis; }
+  .marks { display: flex; flex-wrap: wrap; gap: 3px; }
+  .mark { font-size: 11px; background: #202b39; border: 1px solid #2d3b4d; border-radius: 4px;
+    padding: 0 5px; color: #a8c4e6; }
+  .mark.time { background: #23331f; border-color: #37502f; color: #b7e0a4; }
+  .mark.tool { background: #2a2440; border-color: #42386a; color: #cbb8ff; }
+  .mark.money { background: #1e3540; border-color: #2c5265; color: #a6dcf5; }
+  .mark.spam { background: #402026; border-color: #6b303c; color: #ffb3bd; }
+  .mark.net { background: #1d2a3a; border-color: #2f4661; color: #9fc7ff; }
+  .net { font-size: 11px; border-radius: 4px; padding: 0 5px; background: #1d2a3a;
+    border: 1px solid #2f4661; color: #9fc7ff; white-space: nowrap; }
+  .net.bluesky { background: #1a2b3d; border-color: #2c5478; color: #8fd0ff; }
+  .net.youtube { background: #3a1f24; border-color: #6b3039; color: #ff9aa2; }
+  .net.mastodon { background: #2a2340; border-color: #4a3a70; color: #c9b6ff; }
+  .net.lemmy { background: #1e3326; border-color: #315a3f; color: #a4d6a4; }
+  .net.hackernews { background: #3a2a16; border-color: #6b4c25; color: #ffbe7a; }
+  .net.tiktok { background: #2b2233; border-color: #5a3c66; color: #e0b3ff; }
+  .net.instagram { background: #3a1f2c; border-color: #6b3050; color: #ffa8cf; }
+  .net.reddit { background: #3a2216; border-color: #6b3f25; color: #ffb27a; }
+  select#oppModel { min-width: 230px; }
+  .bar { height: 9px; border-radius: 4px; background: var(--acc); }
+  .barwrap { background: #222b36; border-radius: 4px; overflow: hidden; width: 100%; }
+  .bars { display: grid; grid-template-columns: 190px 1fr 44px; gap: 9px; align-items: center;
+    margin-bottom: 6px; font-size: 13px; }
+  .bars .lab { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+  .bars .lab:hover { color: var(--acc); }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 13px; }
+  .card h3 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--dim); }
+  .hist { display: flex; align-items: flex-end; gap: 2px; height: 90px; }
+  .hist div { flex: 1; background: var(--acc); border-radius: 2px 2px 0 0; min-height: 2px; }
+  .drawer { position: fixed; right: 0; top: 0; bottom: 0; width: min(560px, 94vw); background: var(--panel);
+    border-left: 1px solid var(--line); padding: 16px; overflow: auto; transform: translateX(100%);
+    transition: transform .18s ease; z-index: 50; box-shadow: -14px 0 40px rgba(0,0,0,.5); }
+  .drawer.open { transform: none; }
+  .drawer h4 { margin: 14px 0 6px; font-size: 12px; color: var(--dim); text-transform: uppercase; }
+  .close { position: absolute; right: 12px; top: 10px; }
+  .tweetbody { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 11px; white-space: pre-wrap; word-break: break-word; }
+  .scoreline { display: grid; grid-template-columns: 150px 1fr 46px; gap: 8px; align-items: center;
+    font-size: 12px; margin-bottom: 5px; }
+  .muted { color: var(--dim); font-size: 12px; }
+  .empty { padding: 30px; text-align: center; color: var(--dim); }
+  .opp { display: flex; flex-direction: column; gap: 9px; }
+  .opphead { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .opphead h3 { margin: 0; font-size: 14px; text-transform: none; letter-spacing: 0; color: var(--txt); }
+  .oppexamples { display: flex; flex-direction: column; gap: 5px; }
+  .oppex { cursor: pointer; font-size: 12px; padding: 5px 7px; border: 1px solid var(--line);
+    border-radius: 6px; background: var(--panel2); }
+  .oppex:hover { border-color: var(--acc); }
+  .radar { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 12px; }
+  .radar a { color: var(--acc); text-decoration: none; border: 1px solid var(--line);
+    border-radius: 999px; padding: 1px 8px; }
+  .radar a:hover { border-color: var(--acc); color: #fff; }
+  .oppactions { display: flex; gap: 6px; margin-top: auto; }
+  .oppactions button.on, .oppfilter button.on {
+    background: #1d3a5c; border-color: var(--acc); color: #cfe6ff; }
+  .oppfilter { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
+  .tag { font-size: 11px; border-radius: 999px; padding: 1px 8px; border: 1px solid var(--line); }
+  .tag.guardada { background: #1f3b2a; border-color: var(--a); color: #b7e0a4; }
+  .tag.descartada { background: #402026; border-color: var(--s); color: #ffb3bd; }
+  .tag.multi { background: #16303a; border-color: #2c6b7a; color: #9fe3f0; }
+  .tag.fit, .mark.fit { background: #163a33; border-color: #2c7a67; color: #9fe3d0; }
+  .profilebox { background: var(--panel2); border: 1px solid var(--line); border-radius: 9px;
+    padding: 9px; margin-bottom: 4px; }
+  .profilebox .field:last-child { margin-bottom: 0; }
+  mark { background: #4d6b1f; color: #eaffd0; border-radius: 2px; padding: 0 2px; }
+  .sparkline { width: 100%; height: 46px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>XScraper<span style="color:#3ddc97">+</span> · radar de oportunidades</h1>
+  <div class="meta" id="meta"></div>
+  <div class="row" style="margin-left:auto">
+    <a href="empleo.html" style="color:var(--acc);text-decoration:none;padding:6px 9px;border:1px solid var(--line);border-radius:6px">Empleo →</a>
+    <button id="btnCsv">Exportar CSV (filtrados)</button>
+    <button id="btnReset">Reiniciar filtros</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <h2>Mi perfil</h2>
+    <div class="profilebox">
+      <div class="field">
+        <label for="profileText">Qué sabes hacer y qué te gustaría hacer</label>
+        <textarea id="profileText" rows="4" placeholder="Ej.: sé automatizar con n8n, tengo experiencia en ventas B2B y quiero ofrecer un servicio recurrente a pymes."></textarea>
+      </div>
+      <div class="field">
+        <label>Habilidades</label>
+        <div class="checks" id="skillBtns"></div>
+      </div>
+      <div class="field">
+        <label>Quiero…</label>
+        <div class="checks" id="intentBtns"></div>
+      </div>
+      <div class="field row">
+        <button id="profileClear">Limpiar perfil</button>
+        <span class="muted" id="profileState">sin perfil</span>
+      </div>
+      <div class="muted" id="profileHint">Se guarda solo en este navegador.</div>
+    </div>
+
+    <h2>Búsqueda</h2>
+    <div class="field">
+      <input type="search" id="q" placeholder="texto, autor, hashtag, herramienta…">
+      <div class="muted" id="qhint"></div>
+    </div>
+
+    <h2>Ventana temporal</h2>
+    <div class="field checks" id="winBtns"></div>
+    <div class="muted" id="winHint"></div>
+
+    <h2>Calificación</h2>
+    <div class="field checks" id="gradeBtns"></div>
+
+    <h2>Idioma</h2>
+    <div class="field checks" id="langBtns"></div>
+
+    <h2>Red</h2>
+    <div class="field checks" id="networkBtns"></div>
+
+    <h2>Consulta de origen</h2>
+    <div class="field checks" id="queryBtns"></div>
+
+    <h2>Modelo de negocio</h2>
+    <div class="field checks" id="modelBtns"></div>
+
+    <h2>Tipo de oportunidad</h2>
+    <div class="field checks" id="kindBtns"></div>
+
+    <h2>Umbrales</h2>
+    <div class="field"><label>Me gusta ≥ <b id="likesVal">0</b></label>
+      <input type="range" id="minLikes" min="0" max="2000" value="0" style="width:100%"></div>
+    <div class="field"><label>Vistas ≥ <b id="viewsVal">0</b></label>
+      <input type="range" id="minViews" min="0" max="200000" value="0" style="width:100%"></div>
+    <div class="field"><label>Señales de spam ≤ <b id="spamVal">9</b></label>
+      <input type="range" id="maxSpam" min="0" max="9" value="9" style="width:100%"></div>
+    <div class="field"><label>Puntuación mínima <b id="qualVal">0</b></label>
+      <input type="range" id="minQuality" min="0" max="100" value="0" style="width:100%"></div>
+    <div class="field"><label>Repetibilidad ≥ <b id="repVal">0</b></label>
+      <input type="range" id="minRepeat" min="0" max="100" value="0" style="width:100%"></div>
+    <div class="field"><label>Viabilidad ≥ <b id="viaVal">0</b></label>
+      <input type="range" id="minViability" min="0" max="100" value="0" style="width:100%"></div>
+    <div class="field"><label>Afinidad con mi perfil ≥ <b id="fitVal">0</b></label>
+      <input type="range" id="minFit" min="0" max="100" value="0" style="width:100%" disabled></div>
+
+    <h2>Marcas</h2>
+    <div class="field checks" id="flagBtns"></div>
+
+    <h2>Concepto seleccionado</h2>
+    <div class="field checks" id="activeFilters"></div>
+  </aside>
+
+  <main>
+    <div class="kpis" id="kpis"></div>
+    <div class="tabs" id="tabs"></div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="drawer" id="drawer"></div>
+
+<script src="perfil.js"></script>
+<script src="datos.js"></script>
+<script>
+const D = window.DATOS;
+const T = D.tweets;
+const AGG = D.agg;
+const NOW = Date.now();
+const $ = (s) => document.querySelector(s);
+const el = (tag, cls, html) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (html != null) n.innerHTML = html;
+  return n;
+};
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const num = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? (n / 1e3).toFixed(1) + "k" : String(n || 0));
+const dateShort = (iso) => iso.slice(0, 10);
+const LANGS = { en: "inglés", es: "español", fr: "francés", pt: "portugués", in: "indonesio", de: "alemán", it: "italiano", vi: "vietnamita", zxx: "sin texto", qme: "mixto", und: "sin clasif." };
+const NETWORK_LABELS = { x: "X", bluesky: "Bluesky", youtube: "YouTube", mastodon: "Mastodon", lemmy: "Lemmy", hackernews: "Hacker News", reddit: "Reddit", tiktok: "TikTok", instagram: "Instagram" };
+const netLabel = (n) => NETWORK_LABELS[n] || n || "otra";
+
+const state = {
+  q: "", grades: new Set(), langs: new Set(), queries: new Set(), flags: new Set(),
+  networks: new Set(), models: new Set(), kinds: new Set(), terms: new Set(), window: 90,
+  minLikes: 0, minViews: 0, maxSpam: 9, minQuality: 0, minRepeat: 0, minViability: 0,
+  minFit: 0, oppView: "todas", multiNet: false, oppSort: "priority",
+  sort: { key: "ts", dir: -1 }, tab: "resultados"
+};
+
+/* ---------- perfil local ---------- */
+const PROFILE_KEY = "xscraper.perfil.v1";
+const profile = { text: "", skills: new Set(), intents: new Set() };
+
+function loadProfile() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+    if (!raw) return;
+    profile.text = String(raw.text || "");
+    const validSkills = new Set(Perfil.SKILLS.map((s) => s.id));
+    const validIntents = new Set(Perfil.INTENTS.map((s) => s.id));
+    profile.skills = new Set((raw.skills || []).filter((id) => validSkills.has(id)));
+    profile.intents = new Set((raw.intents || []).filter((id) => validIntents.has(id)));
+  } catch { /* modo privado o JSON inválido */ }
+}
+
+function saveProfile() {
+  try {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify({
+      text: profile.text, skills: [...profile.skills], intents: [...profile.intents]
+    }));
+  } catch { /* modo privado */ }
+}
+
+const profileActive = () => {
+  const r = Perfil.resumen(profile);
+  return r.active && !r.generic;
+};
+const profilePayload = () => ({ text: profile.text, skills: [...profile.skills], intents: [...profile.intents] });
+
+// Pulsar un concepto lo añade como filtro y lleva a la tabla de resultados.
+function pickConcept(label) {
+  state.terms.add(label);
+  state.tab = "resultados";
+  draw();
+}
+
+// Filtros que se expresan como texto libre (autor, mención, plazo) deben
+// reflejarse en la caja de búsqueda; antes filtraban en silencio.
+function setQuery(q) {
+  state.q = q;
+  $("#q").value = q;
+  state.tab = "resultados";
+  draw();
+}
+
+const WINDOWS = [[0, "todo"], [1, "24 h"], [7, "7 días"], [30, "30 días"], [90, "90 días"]];
+const FLAGS = [
+  ["media", "con multimedia", (t) => t.has_media],
+  ["enlace", "con enlaces", (t) => t.domains.length > 0],
+  ["herramienta", "con herramienta", (t) => t.tools.length > 0],
+  ["tiempo", "con plazos", (t) => t.times.length > 0],
+  ["dinero", "con cifras", (t) => t.money.length > 0],
+  ["hashtag", "con hashtags", (t) => t.hashtags.length > 0],
+  ["respuesta", "es respuesta", (t) => t.is_reply],
+  ["retweet", "es retweet", (t) => t.is_retweet],
+  ["azul", "cuenta verificada/blue", (t) => t.author.blue || t.author.verified],
+  ["limpio", "sin señales de spam", (t) => t.spam_flags.length === 0]
+];
+
+/* ---------- filtrado ---------- */
+function matchText(t, q) {
+  // t.query queda fuera del texto buscable: si no, cualquier palabra de la propia
+  // consulta (p.ej. "easy money") casaría con el 100% del corpus.
+  const hay = [t.text, t.author.username, t.author.displayname, t.author.location,
+    ...t.hashtags, ...t.cashtags, ...t.mentions, ...t.tools, ...t.domains, ...t.money,
+    ...t.times.map((x) => x.raw), ...t.spam_flags, ...(t.models || []), ...(t.kinds || []),
+    ...(t.signals ? Object.values(t.signals).flat() : []), t.lang,
+    t.network && t.network !== "x" ? t.network + " " + netLabel(t.network) : ""].join(" ").toLowerCase();
+  const terms = q.toLowerCase().match(/-?"[^"]*"|[^\s]+/g) || [];
+  return terms.every((raw) => {
+    const neg = raw.startsWith("-");
+    // Los autores y menciones se guardan sin @; se lo quito para poder escribirlo.
+    const term = (neg ? raw.slice(1) : raw).replace(/"/g, "").replace(/^@/, "");
+    if (!term) return true;
+    const hit = hay.includes(term);
+    return neg ? !hit : hit;
+  });
+}
+
+/* ---------- afinidad con el perfil ---------- */
+const FIT_CACHE = new Map();
+let FIT_SIG = "";
+let profileWasActive = false;
+
+function refreshFit() {
+  const payload = profilePayload();
+  const sig = JSON.stringify({
+    text: payload.text,
+    skills: [...payload.skills].sort(),
+    intents: [...payload.intents].sort()
+  });
+  if (sig === FIT_SIG) return;
+  FIT_SIG = sig;
+  FIT_CACHE.clear();
+  if (!profileActive()) return;
+  T.forEach((t) => FIT_CACHE.set(t.id, Perfil.evaluate(t, payload)));
+}
+
+function fitOf(t) {
+  return FIT_CACHE.get(t.id) || null;
+}
+
+function syncProfileSort() {
+  const active = profileActive();
+  if (active && !profileWasActive) {
+    // Al estrenar perfil, ordenar por afinidad una vez; después el usuario
+    // puede volver a ordenar por fecha o por cualquier otra columna.
+    state.sort = { key: "fit", dir: -1 };
+    state.oppSort = "fit";
+  } else if (!active && profileWasActive) {
+    state.sort = { key: "ts", dir: -1 };
+    state.oppSort = "priority";
+    state.minFit = 0;
+    $("#minFit").value = 0;
+    $("#fitVal").textContent = "0";
+  }
+  profileWasActive = active;
+}
+
+function pass(t) {
+  if (profileActive() && state.minFit && (fitOf(t)?.fit || 0) < state.minFit) return false;
+  if (state.grades.size && !state.grades.has(t.grade)) return false;
+  if (state.langs.size && !state.langs.has(t.lang)) return false;
+  if (state.networks.size && !state.networks.has(t.network)) return false;
+  if (state.queries.size && !state.queries.has(t.query)) return false;
+  if (state.terms.size) {
+    const pool = new Set([...t.hashtags, ...t.cashtags, ...t.tools, ...t.domains, ...t.mentions, ...t.bigrams, ...t.keywords].map((s) => s.toLowerCase()));
+    // Coincidencia exacta: con "incluye" un concepto corto como AI arrastraba
+    // cualquier palabra que lo contuviera (said, airbnb, monday…).
+    for (const term of state.terms) if (!pool.has(term.toLowerCase())) return false;
+  }
+  for (const [key, , fn] of FLAGS) if (state.flags.has(key) && !fn(t)) return false;
+  if (state.models.size && !(t.models || []).some((m) => state.models.has(m))) return false;
+  if (state.kinds.size && !(t.kinds || []).some((k) => state.kinds.has(k))) return false;
+  if (t.likes < state.minLikes) return false;
+  if (t.views < state.minViews) return false;
+  if (t.spam_flags.length > state.maxSpam) return false;
+  if (t.quality < state.minQuality) return false;
+  if ((t.repeatability || 0) < state.minRepeat) return false;
+  if ((t.viability || 0) < state.minViability) return false;
+  if (state.window && (NOW - t.ts) / 86400000 > state.window) return false;
+  if (state.q.trim() && !matchText(t, state.q.trim())) return false;
+  return true;
+}
+
+function filtered() {
+  refreshFit();
+  const rows = T.filter(pass);
+  const { key, dir } = state.sort;
+  const val = (t) => {
+    if (key === "fit") return fitOf(t)?.fit ?? -1;
+    if (key === "author") return t.author.username;
+    if (key === "grade") return t.quality;
+    if (key === "text") return t.text;
+    return t[key];
+  };
+  return rows.sort((a, b) => {
+    const x = val(a), y = val(b);
+    if (typeof x === "string") return dir * x.localeCompare(y);
+    return dir * ((x || 0) - (y || 0));
+  });
+}
+
+/* ---------- chips de filtro ---------- */
+function chip(label, on, onClick, count) {
+  const c = el("span", "chip" + (on ? " on" : ""), esc(label) + (count != null ? ` <span class="n">${count}</span>` : ""));
+  c.onclick = onClick;
+  return c;
+}
+
+function renderProfile() {
+  const sb = $("#skillBtns"); sb.innerHTML = "";
+  Perfil.SKILLS.forEach((s) => sb.appendChild(
+    chip(s.label, profile.skills.has(s.id), () => {
+      profile.skills.has(s.id) ? profile.skills.delete(s.id) : profile.skills.add(s.id);
+      saveProfile(); draw();
+    })));
+
+  const ib = $("#intentBtns"); ib.innerHTML = "";
+  Perfil.INTENTS.forEach((it) => ib.appendChild(
+    chip(it.label, profile.intents.has(it.id), () => {
+      profile.intents.has(it.id) ? profile.intents.delete(it.id) : profile.intents.add(it.id);
+      saveProfile(); draw();
+    })));
+
+  const r = Perfil.resumen(profile);
+  $("#profileState").textContent = !r.active ? "sin perfil" : r.generic ? "perfil incompleto" : "perfil activo";
+  $("#profileHint").textContent = !r.active
+    ? "Sin perfil: el radar usa la prioridad general. Se guarda solo en este navegador."
+    : r.generic
+      ? "Añade una habilidad o un interés concreto (n8n, ventas, vídeo…) para afinar. La afinidad es orientativa."
+      : `Afinidad activa: ${r.tokens.slice(0, 4).join(", ")}${r.tokens.length > 4 ? "…" : ""}. Orientativa; se guarda solo en este navegador.`;
+  $("#minFit").disabled = !profileActive();
+}
+
+function renderFilters() {
+  const g = $("#gradeBtns"); g.innerHTML = "";
+  [["A", "A destacada"], ["B", "B buena"], ["C", "C floja"], ["D", "D mínima"], ["S", "S sospechosa"]]
+    .forEach(([k, lab]) => g.appendChild(chip(lab, state.grades.has(k), () => {
+      state.grades.has(k) ? state.grades.delete(k) : state.grades.add(k); draw();
+    }, AGG.grades[k] || 0)));
+
+  const w = $("#winBtns"); w.innerHTML = "";
+  WINDOWS.forEach(([d, lab]) => w.appendChild(chip(lab, state.window === d, () => { state.window = d; draw(); })));
+  const winLabel = (WINDOWS.find(([d]) => d === state.window) || [0, "todo"])[1];
+  $("#winHint").textContent = state.window === 0
+    ? "Histórico completo: incluye resultados antiguos de X y Hacker News."
+    : `Mostrando ${winLabel}. Elige «todo» para ver el histórico.`;
+
+  const l = $("#langBtns"); l.innerHTML = "";
+  AGG.languages.filter((x) => x.n >= 2).forEach(({ label, n }) => l.appendChild(
+    chip(LANGS[label] || label, state.langs.has(label), () => {
+      state.langs.has(label) ? state.langs.delete(label) : state.langs.add(label); draw();
+    }, n)));
+
+  const nw = $("#networkBtns"); nw.innerHTML = "";
+  (AGG.networks || []).forEach(({ label, n }) => nw.appendChild(
+    chip(netLabel(label), state.networks.has(label), () => {
+      state.networks.has(label) ? state.networks.delete(label) : state.networks.add(label); draw();
+    }, n)));
+  if (!(AGG.networks || []).length) nw.appendChild(el("span", "muted", "sin redes detectadas"));
+
+  const qs = $("#queryBtns"); qs.innerHTML = "";
+  AGG.queries.forEach(({ label, n }) => {
+    // Etiqueta completa: recortando a 26 caracteres lang:en y lang:es quedaban
+    // indistinguibles y no había forma de saber qué chip pulsabas.
+    const c = chip(label, state.queries.has(label), () => {
+      state.queries.has(label) ? state.queries.delete(label) : state.queries.add(label); draw();
+    }, n);
+    c.title = label;
+    qs.appendChild(c);
+  });
+
+  const mo = $("#modelBtns"); mo.innerHTML = "";
+  (AGG.models || []).forEach(({ label, n }) => {
+    const c = chip(label, state.models.has(label), () => {
+      const activo = state.models.has(label);
+      state.models.clear();
+      if (!activo) state.models.add(label);
+      draw();
+    }, n);
+    c.title = label;
+    mo.appendChild(c);
+  });
+  if (!(AGG.models || []).length) mo.appendChild(el("span", "muted", "sin modelos detectados"));
+
+  const kb = $("#kindBtns"); kb.innerHTML = "";
+  (AGG.kinds || []).filter((x) => x.label !== "sin clasificar").forEach(({ label, n }) => {
+    const c = chip(label, state.kinds.has(label), () => {
+      state.kinds.has(label) ? state.kinds.delete(label) : state.kinds.add(label); draw();
+    }, n);
+    c.title = label === "repetible"
+      ? "proceso, plantilla, automatización o ingresos recurrentes"
+      : label === "especulación" ? "cripto, trading, airdrops o retornos altos" : label;
+    kb.appendChild(c);
+  });
+
+  const f = $("#flagBtns"); f.innerHTML = "";
+  FLAGS.forEach(([key, lab, fn]) => f.appendChild(
+    chip(lab, state.flags.has(key), () => {
+      state.flags.has(key) ? state.flags.delete(key) : state.flags.add(key); draw();
+    }, T.filter(fn).length)));
+
+  const af = $("#activeFilters"); af.innerHTML = "";
+  if (!state.terms.size) af.appendChild(el("span", "muted", "ninguno — pulsa un concepto en las pestañas"));
+  state.terms.forEach((term) => af.appendChild(chip(term + " ×", true, () => { state.terms.delete(term); draw(); })));
+  $("#qhint").textContent = "usa “frase” para literal y -palabra para excluir";
+}
+
+/* ---------- KPIs ---------- */
+function kpi(label, value, sub) {
+  const n = el("div", "kpi", `<div class="v">${value}</div><div class="l">${esc(label)}</div>`);
+  if (sub) n.appendChild(el("div", "muted", sub));
+  return n;
+}
+
+function renderKpis(rows) {
+  const box = $("#kpis"); box.innerHTML = "";
+  const sum = (k) => rows.reduce((a, t) => a + (t[k] || 0), 0);
+  const authors = new Set(rows.map((t) => t.author.username)).size;
+  const avgQ = rows.length ? Math.round(rows.reduce((a, t) => a + t.quality, 0) / rows.length) : 0;
+  const spam = rows.filter((t) => t.spam_flags.length >= 2).length;
+  // No depender del orden actual de la tabla: si se ordena por autor, la
+  // "ventana" seguia mostrando la fecha de la primera y ultima fila visibles.
+  const dates = rows.map((t) => t.iso);
+  const first = dates.length ? dateShort(dates.reduce((a, b) => (a < b ? a : b))) : "—";
+  const last = dates.length ? dateShort(dates.reduce((a, b) => (a > b ? a : b))) : "—";
+  box.append(
+    kpi("Resultados", rows.length, `de ${T.length}`),
+    kpi("Autores", authors),
+    kpi("Me gusta", num(sum("likes"))),
+    kpi("Vistas", num(sum("views"))),
+    kpi("Puntuación media", avgQ, "escala 0-100"),
+    kpi("Con spam ≥2", spam, rows.length ? Math.round((100 * spam) / rows.length) + "%" : "0%"),
+    kpi("Ventana", `${first} → ${last}`)
+  );
+  if (profileActive()) {
+    const high = rows.filter((t) => (fitOf(t)?.fit || 0) >= 50).length;
+    box.insertBefore(
+      kpi("Afinidad ≥50", high, "con tu perfil"),
+      box.children[5] || null
+    );
+  }
+}
+
+/* ---------- barra horizontal reutilizable ---------- */
+function barList(items, onClick, color) {
+  const max = Math.max(1, ...items.map((i) => i.n));
+  const wrap = el("div");
+  items.forEach(({ label, n }) => {
+    const row = el("div", "bars");
+    const lab = el("div", "lab", esc(label));
+    if (onClick) lab.onclick = () => onClick(label);
+    const track = el("div", "barwrap");
+    const bar = el("div", "bar", "");
+    bar.style.width = (100 * n) / max + "%";
+    if (color) bar.style.background = color;
+    track.appendChild(bar);
+    row.append(lab, track, el("div", "n", String(n)));
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+
+function card(title, node, note) {
+  const c = el("div", "card");
+  c.appendChild(el("h3", null, title));
+  if (note) c.appendChild(el("div", "muted", note));
+  c.appendChild(node);
+  return c;
+}
+
+/* ---------- pestaña: resultados ---------- */
+const COLS = [
+  ["date", "Fecha", ""], ["network", "Red", ""], ["author", "Autor", ""], ["text", "Contenido", ""],
+  ["likes", "♥", "n"], ["views", "Vistas", "n"], ["replies", "Resp", "n hide-sm"],
+  ["retweets", "RT", "n hide-sm"], ["quality", "Pun.", "n"], ["fit", "Afinidad", "n"], ["grade", "Calif.", ""]
+];
+
+function tableTab(rows) {
+  const table = el("table");
+  const thead = el("thead");
+  const tr = el("tr");
+  COLS.forEach(([key, label, cls]) => {
+    const th = el("th", cls, esc(label) + (state.sort.key === key ? (state.sort.dir > 0 ? " ▲" : " ▼") : ""));
+    th.onclick = () => {
+      state.sort = { key, dir: state.sort.key === key ? -state.sort.dir : -1 };
+      draw();
+    };
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
+  table.appendChild(thead);
+  const body = el("tbody");
+  rows.slice(0, 400).forEach((t) => {
+    const r = el("tr");
+    r.onclick = () => openDrawer(t);
+    const when = el("td", "who", `${t.iso.slice(0, 16)}<br><span class="muted">hace ${Math.round(t.age_hours)} h · ${t.lang}</span>`);
+    const net = el("td", null, `<span class="net ${esc(t.network || "")}">${esc(netLabel(t.network))}</span>`);
+    const meta = [t.author.followers ? `${num(t.author.followers)} seg` : "", t.author.location || ""].filter(Boolean).join(" · ");
+    const author = el("td", "who author", `<b>@${esc(t.author.username)}</b><br><span class="muted">${esc(meta)}</span>`);
+    author.title = `${t.author.username}${meta ? " · " + meta : ""}`;
+    const marks = el("div", "marks");
+    [...t.hashtags.slice(0, 2)].forEach((h) => marks.appendChild(el("span", "mark", "#" + esc(h))));
+    [...t.tools.slice(0, 2)].forEach((h) => marks.appendChild(el("span", "mark tool", esc(h))));
+    [...t.times.slice(0, 2)].forEach((h) => marks.appendChild(el("span", "mark time", esc(h.raw))));
+    [...t.money.slice(0, 1)].forEach((h) => marks.appendChild(el("span", "mark money", esc(h))));
+    [...t.spam_flags.slice(0, 1)].forEach((h) => marks.appendChild(el("span", "mark spam", esc(h))));
+    const text = el("td", "txt", esc(t.text.slice(0, 190)) + (t.text.length > 190 ? "…" : ""));
+    text.appendChild(marks);
+    const fi = fitOf(t);
+    const fitCell = el("td", "n", fi && fi.fit != null ? `<b>${fi.fit}</b>` : "—");
+    if (fi && fi.reasons.length) fitCell.title = fi.reasons.join(" · ");
+    r.append(when, net, author, text,
+      el("td", "n", num(t.likes)), el("td", "n", num(t.views)), el("td", "n hide-sm", num(t.replies)),
+      el("td", "n hide-sm", num(t.retweets)), el("td", "n", `<b>${t.quality}</b>`),
+      fitCell,
+      el("td", null, `<span class="badge ${t.grade}">${t.grade}</span>`));
+    body.appendChild(r);
+  });
+  table.appendChild(body);
+  const wrap = el("div", "tablewrap");
+  wrap.appendChild(table);
+  if (rows.length > 400) wrap.appendChild(el("div", "muted", `Mostrando 400 de ${rows.length} — estrecha los filtros o exporta el CSV.`));
+  if (!rows.length) wrap.appendChild(el("div", "empty", "Ningún resultado con estos filtros."));
+  return wrap;
+}
+
+/* ---------- pestaña: conceptos ---------- */
+function conceptTab() {
+  const grid = el("div", "cols");
+  const addTerm = pickConcept;
+  grid.append(
+    card("Hashtags", barList(AGG.hashtags.slice(0, 18), addTerm)),
+    card("Cashtags", barList(AGG.cashtags.slice(0, 12), addTerm)),
+    card("Menciones frecuentes", barList(AGG.mentions.slice(0, 14), (l) => setQuery("@" + l))),
+    card("Palabras clave", barList(AGG.keywords.slice(0, 22), addTerm, "var(--acc2)")),
+    card("Frases (bigramas)", barList(AGG.bigrams.slice(0, 22), addTerm, "var(--acc2)")),
+    card("Dominios enlazados", barList(AGG.domains.slice(0, 16), addTerm, "#7fd6c2"))
+  );
+  return grid;
+}
+
+/* ---------- pestaña: herramientas ---------- */
+function toolsTab() {
+  const grid = el("div", "cols");
+  grid.append(
+    card("Herramientas y plataformas citadas", barList(AGG.tools, pickConcept, "#cbb8ff")),
+    card("Cuantos resultados mencionan herramientas",
+      (() => {
+        const withT = T.filter((t) => t.tools.length).length;
+        const w = el("div");
+        w.appendChild(el("div", "bars", `<div class="lab">con herramienta</div><div class="barwrap"><div class="bar" style="width:${100 * withT / T.length}%;background:#cbb8ff"></div></div><div class="n">${withT}</div>`));
+        w.appendChild(el("div", "bars", `<div class="lab">sin herramienta</div><div class="barwrap"><div class="bar" style="width:${100 * (T.length - withT) / T.length}%;background:#5a6a7d"></div></div><div class="n">${T.length - withT}</div>`));
+        w.appendChild(el("div", "muted", "Un resultado sin herramienta ni enlace suele ser opinión, no método."));
+        return w;
+      })()),
+    card("Combinaciones herramienta + plazo", (() => {
+      const rows = T.filter((t) => t.tools.length && t.times.length).slice(0, 20);
+      const w = el("div");
+      if (!rows.length) w.appendChild(el("div", "muted", "sin coincidencias"));
+      rows.forEach((t) => w.appendChild(el("div", null,
+        `<span class="mark tool">${esc(t.tools[0])}</span> <span class="mark time">${esc(t.times[0].raw)}</span> <span class="muted">— ${esc(t.text.slice(0, 62))}…</span>`)));
+      return w;
+    })())
+  );
+  return grid;
+}
+
+/* ---------- pestaña: tiempos ---------- */
+function timesTab() {
+  const grid = el("div", "cols");
+  const buckets = AGG.time_buckets;
+  grid.append(
+    card("Plazos citados (agrupados)", (() => {
+      const items = [
+        { label: "horas", n: buckets.horas }, { label: "días", n: buckets.dias },
+        { label: "semanas", n: buckets.semanas }, { label: "meses", n: buckets.meses },
+        { label: "años o más", n: buckets.anios_o_mas }
+      ];
+      return barList(items, null, "#b7e0a4");
+    })(), "solo expresiones numéricas tipo “30 days” / “en 6 meses”"),
+    card("Volumen por día", (() => {
+      const days = AGG.days;
+      const max = Math.max(1, ...days.map((d) => d.n));
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "sparkline");
+      svg.setAttribute("viewBox", `0 0 ${Math.max(days.length, 1) * 10} 46`);
+      days.forEach((d, i) => {
+        const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        r.setAttribute("x", i * 10); r.setAttribute("width", 8);
+        r.setAttribute("y", 46 - (40 * d.n) / max);
+        r.setAttribute("height", Math.max(2, (40 * d.n) / max));
+        r.setAttribute("fill", "#4da3ff");
+        r.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "title"));
+        r.lastChild.textContent = `${d.label}: ${d.n}`;
+        svg.appendChild(r);
+      });
+      return svg;
+    })(), `${AGG.days.length} días distintos en el corpus`),
+    card("Todas las expresiones de tiempo", (() => {
+      const w = el("div");
+      const sorted = [...AGG.top_times].sort((a, b) => a.days - b.days).slice(0, 30);
+      if (!sorted.length) w.appendChild(el("div", "muted", "sin expresiones numéricas"));
+      sorted.forEach((x) => {
+        const row = el("div", "bars",
+          `<div class="lab" title="filtrar resultados con este plazo">${esc(x.raw)}</div><div class="barwrap"><div class="bar" style="width:${Math.min(100, 100 * Math.log10(1 + x.days) / 2.6)}%;background:#b7e0a4"></div></div><div class="n">${x.days} d</div>`);
+        row.querySelector(".lab").onclick = () => {
+          // matchText busca en t.times[].raw: entrecomillar evita que "30 days"
+          // se interprete como dos términos independientes.
+          setQuery(`"${x.raw}"`);
+        };
+        w.appendChild(row);
+      });
+      return w;
+    })()),
+    card("Cifras de dinero citadas", barList(AGG.money.slice(0, 20), pickConcept, "#a6dcf5"),
+      "pulsa una cifra para filtrar los resultados que la mencionan")
+  );
+  return grid;
+}
+
+/* ---------- pestaña: calificación ---------- */
+function gradeTab() {
+  const grid = el("div", "cols");
+  const hist = Array(10).fill(0);
+  T.forEach((t) => hist[Math.min(9, Math.floor(t.quality / 10))]++);
+  const maxH = Math.max(...hist, 1);
+  const chart = el("div", "hist");
+  hist.forEach((n, i) => {
+    const b = el("div");
+    b.style.height = (100 * n) / maxH + "%";
+    b.title = `${i * 10}-${i * 10 + 9}: ${n} resultados`;
+    b.style.background = n >= maxH * 0.7 ? "var(--acc)" : "#3b6ea5";
+    chart.appendChild(b);
+  });
+  const formula = (() => {
+    const w = el("div");
+    [["Engagement (♥/vistas/RT)", 34, "var(--acc)"], ["Contenido sustancioso", 45, "var(--a)"],
+     ["Autoridad de la cuenta", 21, "var(--acc2)"]].forEach(([lab, pct, col]) => {
+      w.appendChild(el("div", "scoreline", `<div>${lab}</div><div class="barwrap"><div class="bar" style="width:${pct}%;background:${col}"></div></div><div>${pct}%</div>`));
+    });
+    w.appendChild(el("div", "muted", "Penalización: −14 puntos por cada señal de spam (hasta −90), aplicada sobre el bloque de contenido. Letras: A ≥65, B ≥45, C ≥28, D &lt;28, S si acumula ≥3 señales."));
+    return w;
+  })();
+  const byQuality = [...T].sort((a, b) => b.quality - a.quality);
+  grid.append(
+    card("Distribución de puntuación", (() => {
+      const w = el("div");
+      w.appendChild(chart);
+      w.appendChild(el("div", "muted", "0–100 · cada barra = 10 puntos"));
+      return w;
+    })()),
+    card("Cómo se calcula", formula),
+    card("Letras", barList(Object.entries(AGG.grades).sort().map(([label, n]) => ({ label, n })),
+      (l) => { state.grades.add(l); state.tab = "resultados"; draw(); })),
+    card("Señales de spam detectadas", barList(AGG.spam, null, "var(--s)")),
+    card("Los 10 mejor puntuados", topList(byQuality.slice(0, 10))),
+    card("Los 10 peores", topList(byQuality.slice(-10).reverse()))
+  );
+  return grid;
+}
+
+function topList(rows) {
+  const w = el("div");
+  rows.forEach((t) => {
+    const line = el("div", null,
+      `<span class="badge ${t.grade}">${t.grade}</span> <b>${t.quality}</b> <span class="muted">@${esc(t.author.username)} · ♥${num(t.likes)} · ${esc(t.text.slice(0, 58))}…</span>`);
+    line.style.cursor = "pointer";
+    line.onclick = () => openDrawer(t);
+    w.appendChild(line);
+  });
+  return w;
+}
+
+/* ---------- pestaña: autores ---------- */
+function authorTab() {
+  const by = new Map();
+  T.forEach((t) => {
+    const a = by.get(t.author.username) || { u: t.author.username, n: 0, likes: 0, views: 0, q: 0, f: t.author.followers, age: t.account_age_days, spam: 0, blue: t.author.blue };
+    a.n++; a.likes += t.likes; a.views += t.views; a.q += t.quality; a.spam += t.spam_flags.length;
+    by.set(t.author.username, a);
+  });
+  const rows = [...by.values()].map((a) => ({ ...a, avg: Math.round(a.q / a.n), sp: (a.spam / a.n).toFixed(2) }));
+  rows.sort((x, y) => y.n - x.n || y.avg - x.avg);
+  const grid = el("div", "cols");
+  const table = el("table");
+  const head = el("tr");
+  ["Autor", "Tweets", "Punt. media", "♥ totales", "Vistas", "Seguidores", "Antigüedad (d)", "spam/tweet"].forEach((h, i) =>
+    head.appendChild(el("th", i > 0 ? "n" : "", h)));
+  const tb = el("tbody");
+  rows.slice(0, 60).forEach((a) => {
+    const tr = el("tr");
+    tr.onclick = () => setQuery("@" + a.u);
+    tr.append(
+      el("td", null, `<b>@${esc(a.u)}</b>${a.blue ? " <span class='muted'>✔</span>" : ""}`),
+      el("td", "n", String(a.n)), el("td", "n", String(a.avg)), el("td", "n", num(a.likes)),
+      el("td", "n", num(a.views)), el("td", "n", num(a.f)), el("td", "n", String(a.age)),
+      el("td", "n", String(a.sp))
+    );
+    tb.appendChild(tr);
+  });
+  table.append(head, tb);
+  grid.append(card("Autores del corpus (pulsa uno para filtrar)", table,
+    `${rows.length} autores distintos; ${rows.filter((a) => a.n > 1).length} publicaron más de un resultado`));
+  const repeat = barList(rows.filter((a) => a.n > 1).slice(0, 14).map((a) => ({ label: "@" + a.u, n: a.n })),
+    (l) => setQuery(l));
+  grid.append(card("Más repetidos", repeat, "un autor que domina el resultado suele indicar campaña"));
+  return grid;
+}
+
+/* ---------- pestaña: oportunidades ---------- */
+const OPP_KEY = "xscraper.oportunidades.v1";
+const MODEL_QUERIES = {
+  "IA / automatización": "agencia automatización IA",
+  "SaaS / apps": "micro saas",
+  "Contenido / creadores": "canal youtube faceless",
+  "Cursos / mentoría": "curso online mentoría",
+  "Agencia / servicios": "agencia marketing digital",
+  "Afiliación": "marketing de afiliados",
+  "Dropshipping / POD": "dropshipping print on demand",
+  "Trading / cripto": "trading cripto",
+  "Reventa / arbitraje": "reventa arbitraje",
+  "Newsletter / comunidad": "newsletter comunidad",
+  "Servicios locales": "negocio local servicios",
+  "Freelance / remoto": "freelance trabajo remoto",
+};
+const RADAR = [
+  ["X", (q) => `https://x.com/search?q=${encodeURIComponent(q)}&f=live`],
+  ["Bluesky", (q) => `https://bsky.app/search?q=${encodeURIComponent(q)}`],
+  ["TikTok", (q) => `https://www.tiktok.com/search?q=${encodeURIComponent(q)}`],
+  ["YouTube", (q) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`],
+  ["Instagram", (q) => `https://www.google.com/search?q=${encodeURIComponent("site:instagram.com " + q)}`],
+  ["Reddit", (q) => `https://www.reddit.com/search/?q=${encodeURIComponent(q)}`],
+  ["Hacker News", (q) => `https://hn.algolia.com/?q=${encodeURIComponent(q)}`],
+  ["Google", (q) => `https://www.google.com/search?q=${encodeURIComponent(q + " negocio")}`],
+  ["Trends", (q) => `https://trends.google.com/trends/explore?q=${encodeURIComponent(q)}`],
+];
+
+function savedMap() {
+  try { return JSON.parse(localStorage.getItem(OPP_KEY)) || {}; }
+  catch { return {}; }
+}
+
+function setOppStatus(model, status) {
+  const saved = savedMap();
+  if (status) saved[model] = status;
+  else delete saved[model];
+  try { localStorage.setItem(OPP_KEY, JSON.stringify(saved)); } catch { /* modo privado */ }
+  draw();
+}
+
+function topCounts(values, limit = 6) {
+  const counts = new Map();
+  values.forEach((v) => counts.set(v, (counts.get(v) || 0) + 1));
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, limit)
+    .map(([label, n]) => ({ label, n }));
+}
+
+function groupOpportunities(rows) {
+  const by = new Map();
+  rows.forEach((t) => {
+    (t.models || []).forEach((model) => {
+      if (!by.has(model)) by.set(model, []);
+      by.get(model).push(t);
+    });
+  });
+  return [...by.entries()].map(([name, tweets]) => {
+    const n = tweets.length;
+    const avg = (key) => Math.round(tweets.reduce((a, t) => a + (t[key] || 0), 0) / n);
+    const kindCount = {};
+    tweets.forEach((t) => (t.kinds || []).forEach((k) => { kindCount[k] = (kindCount[k] || 0) + 1; }));
+    const fitRank = (t) => (profileActive() ? (fitOf(t)?.fit || 0) : 0);
+    const examples = [...tweets]
+      .sort((a, b) => (fitRank(b) * 3 + b.viability * 2 + b.repeatability + b.quality)
+        - (fitRank(a) * 3 + a.viability * 2 + a.repeatability + a.quality))
+      .slice(0, 3);
+    const fits = profileActive()
+      ? tweets.map((t) => fitOf(t)).filter((x) => x && x.fit != null)
+      : [];
+    return {
+      name, n, tweets, examples, kindCount,
+      avgRepeat: avg("repeatability"), avgVia: avg("viability"), avgSpec: avg("speculation"),
+      avgFit: fits.length ? Math.round(fits.reduce((a, x) => a + x.fit, 0) / fits.length) : null,
+      bestFit: fits.length ? Math.max(...fits.map((x) => x.fit)) : null,
+      fitReasons: topCounts(fits.flatMap((x) => x.reasons), 3).map((x) => x.label),
+      // La prioridad mezcla viabilidad y repetibilidad con el volumen de
+      // evidencia: un modelo con 3 tuits no debería tapar a uno con 60.
+      priority: Math.round(avg("viability") * 0.5 + avg("repeatability") * 0.3 + Math.min(100, n * 3) * 0.2),
+      tools: topCounts(tweets.flatMap((t) => t.tools), 5),
+      money: topCounts(tweets.flatMap((t) => t.money), 3),
+      networks: topCounts(tweets.map((t) => t.network).filter(Boolean), 4),
+      networkCount: new Set(tweets.map((t) => t.network).filter(Boolean)).size,
+      signals: topCounts(tweets.flatMap((t) => Object.values(t.signals || {}).flat()), 6),
+    };
+  }).sort((a, b) => {
+    if (profileActive() && state.oppSort === "fit") {
+      return (b.bestFit ?? -1) - (a.bestFit ?? -1)
+        || (b.avgFit ?? -1) - (a.avgFit ?? -1)
+        || b.priority - a.priority || b.n - a.n;
+    }
+    return b.priority - a.priority || b.avgVia - a.avgVia || b.n - a.n;
+  });
+}
+
+function oppCard(g) {
+  const saved = savedMap()[g.name];
+  const c = el("div", "card opp");
+  const head = el("div", "opphead");
+  head.appendChild(el("h3", null, esc(g.name)));
+  head.appendChild(el("span", "muted", `${g.n} resultado${g.n === 1 ? "" : "s"} · prioridad ${g.priority}`));
+  if (g.bestFit != null) head.appendChild(el("span", "tag fit", `afinidad ${g.bestFit}`));
+  if (saved) head.appendChild(el("span", "tag " + saved, saved === "guardada" ? "guardada" : "descartada"));
+  if (g.networkCount >= 2) head.appendChild(el("span", "tag multi", `multi-red · ${g.networkCount}`));
+  c.appendChild(head);
+
+  const bars = [
+    ["Repetibilidad", g.avgRepeat, "var(--a)"],
+    ["Viabilidad", g.avgVia, "var(--acc)"],
+    ["Especulación", g.avgSpec, "var(--s)"]
+  ];
+  if (g.avgFit != null) bars.unshift(["Afinidad media", g.avgFit, "#7fd6c2"]);
+  bars.forEach(([label, value, color]) => {
+    c.appendChild(el("div", "scoreline",
+      `<div>${label}</div><div class="barwrap"><div class="bar" style="width:${value}%;background:${color}"></div></div><div>${value}</div>`));
+  });
+
+  const kinds = el("div", "marks");
+  Object.entries(g.kindCount).sort((a, b) => b[1] - a[1]).forEach(([kind, n]) =>
+    kinds.appendChild(el("span", "mark", `${esc(kind)} ${n}`)));
+  g.networks.forEach((x) => kinds.appendChild(el("span", "mark net", `${esc(netLabel(x.label))} ${x.n}`)));
+  g.fitReasons.forEach((reason) => kinds.appendChild(el("span", "mark fit", esc(reason))));
+  g.tools.forEach((x) => kinds.appendChild(el("span", "mark tool", `${esc(x.label)} ${x.n}`)));
+  g.money.forEach((x) => kinds.appendChild(el("span", "mark money", esc(x.label))));
+  if (kinds.children.length) c.appendChild(kinds);
+
+  const ex = el("div", "oppexamples");
+  g.examples.forEach((t) => {
+    const row = el("div", "oppex",
+      `<span class="badge ${t.grade}">${t.grade}</span> <b>${t.viability}</b> ` +
+      `<span class="net ${esc(t.network || "")}">${esc(netLabel(t.network))}</span> ` +
+      `<span class="muted">@${esc(t.author.username)} · ${esc(t.text.slice(0, 145))}${t.text.length > 145 ? "…" : ""}</span>`);
+    row.onclick = () => openDrawer(t);
+    ex.appendChild(row);
+  });
+  c.appendChild(ex);
+
+  const radar = el("div", "radar");
+  radar.appendChild(el("span", "muted", "Radar externo:"));
+  const q = MODEL_QUERIES[g.name] || g.name;
+  RADAR.forEach(([label, url]) => {
+    const a = el("a", null, label);
+    a.href = url(q);
+    a.target = "_blank";
+    a.rel = "noopener";
+    radar.appendChild(a);
+  });
+  c.appendChild(radar);
+
+  const actions = el("div", "oppactions");
+  const save = el("button", saved === "guardada" ? "on" : "", saved === "guardada" ? "Guardada ✓" : "Guardar");
+  save.onclick = () => setOppStatus(g.name, saved === "guardada" ? null : "guardada");
+  const discard = el("button", saved === "descartada" ? "on" : "", saved === "descartada" ? "Descartada ✕" : "Descartar");
+  discard.onclick = () => setOppStatus(g.name, saved === "descartada" ? null : "descartada");
+  actions.append(save, discard);
+  c.appendChild(actions);
+  return c;
+}
+
+function opportunitiesTab(rows) {
+  let groups = groupOpportunities(rows);
+  if (state.models.size) groups = groups.filter((g) => state.models.has(g.name));
+  const modeled = rows.filter((t) => (t.models || []).length).length;
+  const saved = savedMap();
+  const savedN = Object.values(saved).filter((v) => v === "guardada").length;
+  const discardedN = Object.values(saved).filter((v) => v === "descartada").length;
+
+  const wrap = el("div");
+  const summary = el("div", "kpis");
+  summary.append(
+    kpi("Modelos detectados", groups.length, "agrupados por modelo"),
+    kpi("Resultados con modelo", modeled, `de ${rows.length} filtrados`),
+    kpi("Redes", new Set(rows.map((t) => t.network)).size, "con datos"),
+    kpi("Modelos multi-red", groups.filter((g) => g.networkCount >= 2).length, "en ≥2 redes"),
+    kpi("Guardadas", savedN, "tu bandeja"),
+    kpi("Descartadas", discardedN)
+  );
+  if (profileActive()) {
+    const fits = groups.map((g) => g.avgFit).filter((x) => x != null);
+    if (fits.length) summary.insertBefore(
+      kpi("Afinidad media", Math.round(fits.reduce((a, b) => a + b, 0) / fits.length), "de los modelos"),
+      summary.children[4] || null
+    );
+  }
+  wrap.appendChild(summary);
+  wrap.appendChild(el("div", "muted",
+    "Agrupación heurística: un tuit puede aparecer en varios modelos. La afinidad es una coincidencia de texto con tu perfil, no una validación. Usa Guardar/Descartar para tu bandeja; se guarda en este navegador."));
+  wrap.appendChild(el("div", "muted",
+    "La app ingiere X, Bluesky, YouTube y Hacker News; el radar abre búsquedas manuales en el resto de redes."));
+
+  const modelBar = el("div", "oppfilter");
+  modelBar.appendChild(el("span", "muted", "Modelo:"));
+  const modelSel = el("select");
+  modelSel.id = "oppModel";
+  modelSel.appendChild(new Option("Todos los modelos", ""));
+  (AGG.models || []).forEach(({ label, n }) => modelSel.appendChild(new Option(`${label} (${n})`, label)));
+  modelSel.value = state.models.size === 1 ? [...state.models][0] : "";
+  modelSel.onchange = () => {
+    state.models.clear();
+    if (modelSel.value) state.models.add(modelSel.value);
+    draw();
+  };
+  modelBar.appendChild(modelSel);
+  wrap.appendChild(modelBar);
+
+  const bar = el("div", "oppfilter");
+  [["todas", "Todas"], ["guardada", "Guardadas"], ["descartada", "Descartadas"], ["pendiente", "Sin decidir"]]
+    .forEach(([key, label]) => {
+      const b = el("button", state.oppView === key ? "on" : "", label);
+      b.onclick = () => { state.oppView = key; draw(); };
+      bar.appendChild(b);
+    });
+  const multi = el("button", state.multiNet ? "on" : "", "Multi-red (≥2)");
+  multi.onclick = () => { state.multiNet = !state.multiNet; draw(); };
+  bar.appendChild(multi);
+  wrap.appendChild(bar);
+
+  const sortBar = el("div", "oppfilter");
+  sortBar.appendChild(el("span", "muted", "Ordenar por:"));
+  [["priority", "Prioridad"], ["fit", "Afinidad con mi perfil"]].forEach(([key, label]) => {
+    const b = el("button", state.oppSort === key ? "on" : "", label);
+    b.disabled = key === "fit" && !profileActive();
+    if (b.disabled) b.title = "Añade tu perfil para ordenar por afinidad";
+    b.onclick = () => { state.oppSort = key; draw(); };
+    sortBar.appendChild(b);
+  });
+  wrap.appendChild(sortBar);
+
+  let shown = groups;
+  if (state.multiNet) shown = shown.filter((g) => g.networkCount >= 2);
+  if (state.oppView === "pendiente") shown = shown.filter((g) => !saved[g.name]);
+  else if (state.oppView !== "todas") shown = shown.filter((g) => saved[g.name] === state.oppView);
+
+  if (!shown.length) {
+    wrap.appendChild(el("div", "empty", groups.length
+      ? "Ningún modelo en esta vista. Prueba otra pestaña de la bandeja."
+      : "Ningún modelo detectado con estos filtros. Revisa Resultados o amplía las consultas."));
+  }
+  const grid = el("div", "cols");
+  shown.forEach((g) => grid.appendChild(oppCard(g)));
+  wrap.appendChild(grid);
+
+  const unmodeled = rows.length - modeled;
+  if (unmodeled > 0) {
+    wrap.appendChild(el("div", "muted",
+      `${unmodeled} resultados sin modelo detectado; no se agrupan aquí. Se pueden revisar en Resultados o con consultas más específicas.`));
+  }
+  return wrap;
+}
+
+/* ---------- panel de detalle ---------- */
+function openDrawer(t) {
+  const d = $("#drawer");
+  const hl = (txt) => {
+    let out = esc(txt);
+    const q = state.q.trim();
+    if (q) q.match(/[^\s-]+/g).forEach((w) => { if (w.length > 2) out = out.replace(new RegExp(`(${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "ig"), "<mark>$1</mark>"); });
+    return out;
+  };
+  const comp = [["engagement", "Engagement", "var(--acc)"], ["substance", "Contenido", "var(--a)"],
+    ["authority", "Autoridad", "var(--acc2)"], ["penalty", "Penalización spam", "var(--s)"]];
+  d.innerHTML = "";
+  d.appendChild(el("button", "close", "✕"));
+  d.querySelector(".close").onclick = () => d.classList.remove("open");
+  d.appendChild(el("h3", null, `@${esc(t.author.username)} · <span class="muted">${esc(t.author.displayname)}</span>`));
+  d.appendChild(el("div", "muted",
+    `<span class="net ${esc(t.network || "")}">${esc(netLabel(t.network))}</span> · ${esc(t.content_type || "post")} · ${t.iso.slice(0, 16)} UTC · lengua ${t.lang} · consulta: ${esc(t.query)}`));
+  d.appendChild(el("div", "tweetbody", hl(t.text)));
+  d.appendChild(el("h4", null, "Enlace y origen"));
+  d.appendChild(el("div", null, `<a href="${esc(t.url)}" target="_blank" rel="noopener" style="color:var(--acc)">${esc(t.url)}</a>`
+    + (t.is_reply ? ` · respondiendo a @${esc(t.reply_to)}` : "")
+    + (t.source_label ? ` · vía ${esc(t.source_label)}` : "")));
+  d.appendChild(el("h4", null, "Conceptos detectados"));
+  const marks = el("div", "marks");
+  t.hashtags.forEach((h) => marks.appendChild(el("span", "mark", "#" + esc(h))));
+  t.cashtags.forEach((h) => marks.appendChild(el("span", "mark", "$" + esc(h))));
+  t.mentions.forEach((h) => marks.appendChild(el("span", "mark", "@" + esc(h))));
+  t.domains.forEach((h) => marks.appendChild(el("span", "mark", esc(h))));
+  t.tools.forEach((h) => marks.appendChild(el("span", "mark tool", esc(h))));
+  t.times.forEach((x) => marks.appendChild(el("span", "mark time", esc(x.raw) + (x.days != null ? ` ≈${x.days}d` : ""))));
+  t.money.forEach((h) => marks.appendChild(el("span", "mark money", esc(h))));
+  t.spam_flags.forEach((h) => marks.appendChild(el("span", "mark spam", esc(h))));
+  if (!marks.children.length) marks.appendChild(el("span", "muted", "sin señales"));
+  d.appendChild(marks);
+  const kind = t.kind || "sin clasificar";
+  d.appendChild(el("h4", null, `Oportunidad · ${esc(kind)}`));
+  d.appendChild(el("div", "muted",
+    `modelos: ${(t.models || []).join(", ") || "—"} · repetibilidad ${t.repeatability || 0}/100 · viabilidad ${t.viability || 0}/100 · especulación ${t.speculation || 0}/100`));
+  const sig = el("div", "marks");
+  Object.entries(t.signals || {}).forEach(([group, labels]) =>
+    (labels || []).forEach((label) => sig.appendChild(el("span", "mark", `${esc(group)}: ${esc(label)}`))));
+  if (sig.children.length) d.appendChild(sig);
+
+  const fi = fitOf(t);
+  if (fi && fi.fit != null) {
+    d.appendChild(el("h4", null, `Afinidad con tu perfil · ${fi.fit}/100`));
+    d.appendChild(el("div", "scoreline",
+      `<div>Afinidad orientativa</div><div class="barwrap"><div class="bar" style="width:${fi.fit}%;background:#7fd6c2"></div></div><div>${fi.fit}</div>`));
+    if (fi.matched.length) d.appendChild(el("div", "muted", `Coincidencias: ${fi.matched.join(", ")}`));
+    const why = el("div", "marks");
+    fi.reasons.forEach((reason) => why.appendChild(el("span", "mark fit", esc(reason))));
+    if (why.children.length) d.appendChild(why);
+  }
+
+  d.appendChild(el("h4", null, `Calificación ${t.quality}/100 · letra ${t.grade}`));
+  comp.forEach(([key, lab, col]) => d.appendChild(el("div", "scoreline",
+    `<div>${lab}</div><div class="barwrap"><div class="bar" style="width:${t[key]}%;background:${col}"></div></div><div>${t[key]}</div>`)));
+  d.appendChild(el("h4", null, "Métricas"));
+  d.appendChild(el("div", "muted", `♥ ${num(t.likes)} · vistas ${num(t.views)} · respuestas ${num(t.replies)} · RT ${num(t.retweets)} · citas ${num(t.quotes)} · marcadores ${num(t.bookmarks)}`));
+  d.appendChild(el("h4", null, "Autor"));
+  d.appendChild(el("div", "muted", `${num(t.author.followers)} seguidores · ${num(t.author.following)} siguiendo · ${num(t.author.statuses)} publicaciones · cuenta de ${t.account_age_days} días · ${t.author.blue ? "blue" : "sin blue"}${t.author.protected ? " · privada" : ""}`));
+  if (t.author.description) d.appendChild(el("div", "muted", "bio: " + esc(t.author.description)));
+  d.appendChild(el("div", null, ""));
+  d.appendChild(el("div", "muted", `${t.words} palabras · multimedia: ${t.media_kinds.join(", ") || "no"}`));
+  d.classList.add("open");
+}
+
+/* ---------- csv ---------- */
+function exportCsv() {
+  const rows = filtered();
+  const cols = ["id", "network", "content_type", "iso", "author", "text", "likes", "views", "replies", "retweets", "quality", "grade",
+    "models", "kind", "repeatability", "viability", "speculation", "fit", "fit_reasons",
+    "hashtags", "tools", "times", "money", "domains", "spam_flags", "query", "url"];
+  const cell = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
+  const lines = [cols.join(",")];
+  rows.forEach((t) => lines.push(cols.map((c) => {
+    if (c === "author") return cell(t.author.username);
+    if (c === "fit") return cell(fitOf(t)?.fit ?? "");
+    if (c === "fit_reasons") return cell((fitOf(t)?.reasons || []).join("|"));
+    if (c === "times") return cell(t.times.map((x) => x.raw).join("|"));
+    if (Array.isArray(t[c])) return cell(t[c].join("|"));
+    return cell(t[c]);
+  }).join(",")));
+  const blob = new Blob(["" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `xscraper_${rows.length}_resultados.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ---------- tabs ---------- */
+const TABS = [
+  ["resultados", "Resultados", tableTab],
+  ["oportunidades", "Oportunidades", opportunitiesTab],
+  ["conceptos", "Conceptos", conceptTab],
+  ["herramientas", "Herramientas", toolsTab],
+  ["tiempos", "Tiempos", timesTab],
+  ["calificacion", "Calificación", gradeTab],
+  ["autores", "Autores", authorTab]
+];
+
+function renderTabs() {
+  const box = $("#tabs"); box.innerHTML = "";
+  TABS.forEach(([key, label]) => {
+    const t = el("div", "tab" + (state.tab === key ? " on" : ""), label);
+    t.onclick = () => { state.tab = key; draw(); };
+    box.appendChild(t);
+  });
+}
+
+function draw() {
+  refreshFit();
+  syncProfileSort();
+  renderProfile();
+  const rows = filtered();
+  renderFilters();
+  renderKpis(rows);
+  renderTabs();
+  const view = $("#view");
+  view.innerHTML = "";
+  const def = TABS.find(([k]) => k === state.tab);
+  view.appendChild(def[2](rows));
+}
+
+/* ---------- enlaces ---------- */
+$("#q").oninput = (e) => {
+  state.q = e.target.value;
+  if (state.q.trim()) state.tab = "resultados";
+  draw();
+};
+$("#minLikes").oninput = (e) => { state.minLikes = +e.target.value; $("#likesVal").textContent = e.target.value; draw(); };
+$("#minViews").oninput = (e) => { state.minViews = +e.target.value; $("#viewsVal").textContent = e.target.value; draw(); };
+$("#maxSpam").oninput = (e) => { state.maxSpam = +e.target.value; $("#spamVal").textContent = e.target.value; draw(); };
+$("#minQuality").oninput = (e) => { state.minQuality = +e.target.value; $("#qualVal").textContent = e.target.value; draw(); };
+$("#minRepeat").oninput = (e) => { state.minRepeat = +e.target.value; $("#repVal").textContent = e.target.value; draw(); };
+$("#minViability").oninput = (e) => { state.minViability = +e.target.value; $("#viaVal").textContent = e.target.value; draw(); };
+$("#minFit").oninput = (e) => { state.minFit = +e.target.value; $("#fitVal").textContent = e.target.value; draw(); };
+let profileTimer;
+$("#profileText").oninput = (e) => {
+  profile.text = e.target.value;
+  saveProfile();
+  clearTimeout(profileTimer);
+  profileTimer = setTimeout(draw, 220);
+};
+$("#profileClear").onclick = () => {
+  profile.text = "";
+  profile.skills.clear();
+  profile.intents.clear();
+  $("#profileText").value = "";
+  saveProfile();
+  draw();
+};
+$("#btnCsv").onclick = exportCsv;
+$("#btnReset").onclick = () => {
+  Object.assign(state, {
+    q: "", grades: new Set(), langs: new Set(), queries: new Set(), flags: new Set(),
+    networks: new Set(), models: new Set(), kinds: new Set(), terms: new Set(), window: 90,
+    minLikes: 0, minViews: 0, maxSpam: 9, minQuality: 0, minRepeat: 0, minViability: 0,
+    minFit: 0, oppView: "todas", multiNet: false, tab: state.tab
+  });
+  $("#q").value = "";
+  ["minLikes", "minViews", "minQuality", "minRepeat", "minViability", "minFit"].forEach((id) => { $("#" + id).value = 0; });
+  $("#maxSpam").value = 9;
+  ["likesVal", "viewsVal", "qualVal", "repVal", "viaVal", "fitVal"].forEach((id) => { $("#" + id).textContent = "0"; });
+  $("#spamVal").textContent = "9";
+  draw();
+};
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#drawer").classList.remove("open"); });
+
+loadProfile();
+$("#profileText").value = profile.text;
+
+$("#meta").innerHTML = `${D.count} resultados únicos · ${D.files.length} fuentes · generado ${esc(D.built_at)}`;
+draw();
+</script>
+</body>
+</html>

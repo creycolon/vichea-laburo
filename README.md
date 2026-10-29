@@ -6,6 +6,7 @@ deduplica las ofertas y las normaliza por empresa, ubicación, modalidad y área
 ```
 apps/web/     # landing + auth + panel (Astro 5 SSR + Supabase)
 apps/radar/   # panel de analista sobre la salida de XScraper (sin login)
+apps/xscraper-plus/  # edición personal: copia congelada del radar de señales (uso propio)
 xscraper/     # XScraper: motor de relevamiento (hoy escribe data.json)
 db/           # schema Postgres: supabase.sql (auth + RLS) y schema.sql (portable)
 docs/         # DER explicado y decisiones de arquitectura
