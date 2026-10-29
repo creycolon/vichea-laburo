@@ -50,6 +50,23 @@ registro e ingreso avisan que el registro todavía no está abierto.
 **Para producción real: no setear `PUBLIC_DEMO`.** Sin esa variable, y apenas `SUPABASE_URL` y
 `SUPABASE_ANON_KEY` existen, las rutas vuelven a exigir sesión de verdad (302 a `/login`).
 
+## Afinidad y transparencia
+
+Cada oferta se puntúa de 0 a 100 contra el perfil del visitante y **siempre viaja con las
+razones** que producen el número. El perfil (habilidades, intención, modalidad, zona) vive en
+`localStorage`: no se envía al servidor ni se guarda en la base.
+
+- `src/lib/skills.ts` — taxonomía de 12 habilidades con sus términos; un término puede
+  pertenecer a dos (SQL es programación y datos).
+- `src/lib/fit.ts` — `scoreJob()` y `transparency()`. La segunda señala avisos fantasma
+  (60+ días), empresas sin identificar o posts sin modalidad.
+- `src/client/busquedas.ts` — perfil + orden por afinidad + filtro «solo ≥60%».
+
+Sin perfil no se inventa un número: la columna muestra `—`.
+
+Los pesos están calibrados para que un aviso que coincide en habilidad, área y seniority
+llegue a ~70-90, y uno de otra área quede por debajo de 30.
+
 ## Endpoints
 
 | Ruta | Método | Qué hace |

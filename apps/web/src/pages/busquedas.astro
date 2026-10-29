@@ -36,6 +36,41 @@ const ok = Astro.url.searchParams.get('ok');
 
       {ok && <div class="alert ok">Búsqueda guardada.</div>}
 
+      <div class="profile" id="profilePanel">
+        <div class="profile-head">
+          <strong>Mi perfil</strong>
+          <span class="dim" id="profileState">sin perfil</span>
+          <button class="chip" id="clearProfile">Limpiar perfil</button>
+        </div>
+        <div class="profile-body">
+          <div>
+            <span class="lbl">Qué sabés hacer</span>
+            <div class="chips" id="skills"></div>
+          </div>
+          <div class="profile-selects">
+            <label>Quiero… <select id="intent">
+              <option value="primer-empleo">mi primer empleo</option>
+              <option value="cambiar-area">cambiar de área</option>
+              <option value="remoto">trabajar remoto</option>
+              <option value="mejorar">mejorar lo que tengo</option>
+            </select></label>
+            <label>Modalidad <select id="pmod">
+              <option value="cualquiera">cualquiera</option>
+              <option value="remoto">remoto</option>
+              <option value="híbrido">híbrido</option>
+              <option value="presencial">presencial</option>
+            </select></label>
+            <label>Dónde <select id="pgeo">
+              <option value="cualquiera">cualquiera</option>
+              <option value="Argentina">Argentina</option>
+              <option value="LATAM">LATAM</option>
+              <option value="Global / remoto">global</option>
+            </select></label>
+          </div>
+          <p class="dim" style="margin:6px 0 0;font-size:12px">Se guarda solo en este navegador.</p>
+        </div>
+      </div>
+
       <div class="toolbar">
         <input type="search" id="q" placeholder="Puesto, empresa, tecnología…" />
         <span class="chip on" data-k="geo" data-v="">Todas</span>
@@ -49,13 +84,14 @@ const ok = Astro.url.searchParams.get('ok');
       <div class="toolbar">
         <span class="chip on" data-k="area" data-v="">Toda área</span>
         {areas.map((a) => <span class="chip" data-k="area" data-v={a}>{a}</span>)}
+        <span class="chip" id="minFit" title="Sólo ofertas con 60% o más de afinidad">Solo ≥60% afinidad</span>
         <button class="btn" id="saveBtn" style="margin-left:auto">Guardar esta búsqueda</button>
       </div>
 
       <table class="table">
         <thead>
           <tr>
-            <th>Puesto</th><th>Empresa</th><th>Ubicación</th><th>Modalidad</th><th>Área</th><th>Fuente</th><th></th>
+            <th>Puesto y por qué</th><th>Empresa</th><th>Ubicación</th><th>Modalidad</th><th>Área</th><th>Antig.</th><th>Señales</th><th>Afinidad</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -70,86 +106,9 @@ const ok = Astro.url.searchParams.get('ok');
   </main>
 
   <script define:vars={{ jobs, guardadas, configured: Astro.locals.configured, dev: import.meta.env.DEV }}>
-    const state = { q: '', geo: '', modality: '', area: '' };
-    const $ = (id) => document.getElementById(id);
-    const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const tagClass = (m) => (m === 'presencial' ? 'p' : m === 'híbrido' ? 'h' : 'r');
-
-    function render() {
-      const out = jobs.filter((j) => {
-        if (state.geo && j.geo !== state.geo) return false;
-        if (state.modality && j.modality !== state.modality) return false;
-        if (state.area && j.area !== state.area) return false;
-        if (state.q) {
-          const hay = `${j.title} ${j.company} ${j.area} ${j.source}`.toLowerCase();
-          if (!hay.includes(state.q)) return false;
-        }
-        return true;
-      });
-      $('count').textContent = `${out.length} de ${jobs.length}`;
-      $('rows').innerHTML = out.length
-        ? out.map((j) => `
-          <tr>
-            <td><a href="${j.url}" target="_blank" rel="noopener">${esc(j.title)}</a></td>
-            <td style="color:var(--dim)">${esc(j.company || '—')}</td>
-            <td style="color:var(--dim)">${esc(j.geo)}</td>
-            <td><span class="tag ${tagClass(j.modality)}">${esc(j.modality)}</span></td>
-            <td style="color:var(--dim)">${esc(j.area)}</td>
-            <td style="color:var(--dim-2);font-size:12px">${esc(j.source)}</td>
-            <td style="color:var(--dim-2);font-size:12px;white-space:nowrap">${j.days !== null ? j.days + ' d' : ''}</td>
-          </tr>`).join('')
-        : '<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:40px">Nada con esos filtros.</td></tr>';
-    }
-
-    document.querySelectorAll('[data-k]').forEach((el) =>
-      el.addEventListener('click', () => {
-        const k = el.dataset.k, v = el.dataset.v;
-        state[k] = state[k] === v ? '' : v;
-        document.querySelectorAll(`[data-k="${k}"]`).forEach((x) => x.classList.toggle('on', x.dataset.v === state[k]));
-        render();
-      }));
-
-    $('q').addEventListener('input', (e) => { state.q = e.target.value.toLowerCase().trim(); render(); });
-
-    // --- guardado ---
-    const LOCAL_KEY = 'vichea.searches.v1';
-    const localSearches = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]'); } catch { return []; } };
-    const renderGuardadas = () => {
-      const items = configured ? guardadas : localSearches();
-      $('guardadasSub').textContent = configured
-        ? 'Se guardan en tu organización y sirven para generar alertas diarias.'
-        : dev
-          ? 'Modo demostración: se guardan sólo en este navegador (localStorage). Con Supabase configurado van a la base.'
-          : 'Modo demostración: por ahora las búsquedas quedan en este navegador.';
-      $('guardadasList').innerHTML = items.length
-        ? `<div class="grid3">${items.map((s) => `
-            <article class="card">
-              <h3 style="margin-top:0">${esc(s.name)}</h3>
-              <p style="font-size:12.5px;color:var(--dim-2)">${esc(JSON.stringify(s.filters))}</p>
-            </article>`).join('')}</div>`
-        : '<div class="empty"><strong>Todavía no guardaste ninguna</strong>Filtrá y usá “Guardar esta búsqueda”.</div>';
-    };
-
-    $('saveBtn').addEventListener('click', async () => {
-      const name = [state.geo || 'Todas', state.modality || 'todas las modalidades', state.area || 'todas las áreas']
-        .join(' · ') + (state.q ? ` · “${state.q}”` : '');
-      const filters = { ...state };
-      if (!configured) {
-        const list = localSearches();
-        list.push({ id: crypto.randomUUID(), name, filters });
-        localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
-        renderGuardadas();
-        return;
-      }
-      const res = await fetch('/api/busquedas', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ name, filters }),
-      });
-      if (res.ok) location.href = '/busquedas?ok=1';
-    });
-
-    render();
-    renderGuardadas();
+    window.__RADAR__ = { jobs, guardadas, configured, dev };
+  </script>
+  <script>
+    import '../client/busquedas.ts';
   </script>
 </Layout>
