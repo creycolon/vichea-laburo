@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPlan, locationOf, dedupeHash, slugify } from '../src/ingest.mjs';
+import { buildPlan, locationOf, dedupeHash, slugify, canonicalUrl } from '../src/ingest.mjs';
 
 const job = (over = {}) => ({
   title: 'Desarrollador Junior', company: 'ADN - Recursos Humanos',
@@ -85,4 +85,25 @@ test('dedupeHash cambia si cambia la geografía', () => {
   const b = dedupeHash('adn', 'Desarrollador Junior', 'LATAM');
   assert.notEqual(a, b);
   assert.equal(a.length, 40);
+});
+
+test('canonicalUrl descarta el fragmento que cambia por posición en el listado', () => {
+  const a = canonicalUrl('https://ar.computrabajo.com/x/oferta-ABC#lc=ListOffers-Score4-1');
+  const b = canonicalUrl('https://ar.computrabajo.com/x/oferta-ABC#lc=ListOffers-Score4-9');
+  assert.equal(a, b);
+  assert.ok(!a.includes('#'));
+});
+
+test('canonicalUrl normaliza el host a minúsculas (RemoteOK)', () => {
+  const a = canonicalUrl('https://remoteOK.com/remote-jobs/x-1');
+  const b = canonicalUrl('https://remoteok.com/remote-jobs/x-1');
+  assert.equal(a, b);
+});
+
+test('canonicalUrl quita parámetros de tracking y es idempotente', () => {
+  const u = canonicalUrl('https://x.com/a?utm_source=news&id=7&lc=3');
+  assert.ok(!u.includes('utm_source'));
+  assert.ok(!u.includes('lc='));
+  assert.ok(u.includes('id=7'));
+  assert.equal(canonicalUrl(u), u);
 });

@@ -47,6 +47,26 @@ export const dedupeHash = (companySlug, title, geoBucket) =>
     .update(`${companySlug}|${slugify(title)}|${geoBucket}`)
     .digest('hex');
 
+/**
+ * URL canónica para identificar un avistamiento. Computrabajo agrega un fragmento
+ * `#lc=ListOffers-Score4-N` que cambia según la posición en el listado: sin esto, la
+ * misma oferta entra como un registro nuevo en cada corrida.
+ */
+export function canonicalUrl(u = '') {
+  try {
+    const url = new URL(u);
+    url.hash = '';
+    url.hostname = url.hostname.toLowerCase();   // RemoteOK publica 'remoteOK.com' en mayúsculas
+    url.protocol = url.protocol.toLowerCase();
+    for (const key of [...url.searchParams.keys()]) {
+      if (/^(utm_|lc$|ref$|src$|source$|trk$|tracking$)/i.test(key)) url.searchParams.delete(key);
+    }
+    return url.toString();
+  } catch {
+    return String(u).split('#')[0];
+  }
+}
+
 const MODALITY = { remoto: 'remoto', 'híbrido': 'hibrido', presencial: 'presencial' };
 const SENIORITY = ['trainee', 'junior', 'mid', 'senior', 'lead', 'director'];
 
@@ -88,7 +108,7 @@ export function buildPlan(jobs, { sourceSlug = 'xscraper' } = {}) {
         area: j.area ?? null,
         status: 'open',
         source_slug: SOURCE_SLUGS[j.source] ?? slugify(j.source ?? sourceSlug),
-        source_url: j.url,
+        source_url: canonicalUrl(j.url),
         posted_days_ago: j.days ?? null,
       };
       seenHash.set(hash, row);
@@ -98,7 +118,7 @@ export function buildPlan(jobs, { sourceSlug = 'xscraper' } = {}) {
     records.push({
       dedupe_hash: hash,
       source_slug: SOURCE_SLUGS[j.source] ?? slugify(j.source ?? sourceSlug),
-      url: j.url,
+      url: canonicalUrl(j.url),
       external_id: null,
     });
   }

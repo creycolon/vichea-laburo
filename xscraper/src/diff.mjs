@@ -13,7 +13,8 @@ const [prevFile, curFile] = files.slice(-2);
 const prev = JSON.parse(fs.readFileSync(path.join(dir, prevFile), 'utf8'));
 const cur = JSON.parse(fs.readFileSync(path.join(dir, curFile), 'utf8'));
 
-const key = (j) => j.url.replace(/[?#].*$/, '');
+import { canonicalUrl } from './ingest.mjs';
+const key = (j) => canonicalUrl(j.url);
 const prevKeys = new Map(prev.jobs.map(j => [key(j), j]));
 const curKeys = new Map(cur.jobs.map(j => [key(j), j]));
 
