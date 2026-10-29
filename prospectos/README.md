@@ -31,12 +31,37 @@ node cli.mjs export > prospectos.csv
 
 ## Búsquedas útiles en X
 
+**Para descubrir personas** (pestaña *Personas*; ahí no funcionan los operadores avanzados):
+
 ```
-"recruiter" (CABA OR Argentina) -hiring
-"talent acquisition" Argentina
-"busco programador" junior
-"reclutador" remoto LATAM
+recruiter CABA
+reclutador Argentina
+talent acquisition LATAM
+IT recruiter Buenos Aires
 ```
+
+**Para verificar que están activos** (búsqueda de posts, últimos 30 días):
+
+```
+("recruiter" OR "reclutador" OR "talent acquisition") (CABA OR Argentina) lang:es -filter:replies since:2026-09-29 min_faves:5
+```
+
+**Para encontrar los que están publicando búsquedas ahora** — la mejor señal de que contratan:
+
+```
+("buscamos" OR "estamos buscando") (junior OR trainee OR "sin experiencia") (CABA OR Argentina) lang:es -filter:replies since:2026-10-15
+```
+
+### Sobre `min_faves`
+
+Sirve para sacar ruido, pero **no lo subas mucho**: un reclutador que trabaja todo el día no
+suele pasar los 100 likes. Con `min_faves:100` encontrás cuentas grandes y de contenido, que son
+justamente las que menos contestan DMs. Rango útil: **5 a 20**.
+
+### Sobre `-hiring`
+
+Excluye a quien está publicando búsquedas, que es exactamente la señal de que está contratando.
+Conviene usarlo solo si buscás cuentas de contenido, no reclutadores en activo.
 
 Filtrá por personas (no cuentas de empresa), mirá si tienen el DM abierto y anotá en `--nota`
 algo real del perfil: es lo que hace que el mensaje no parezca plantilla.
