@@ -18,6 +18,7 @@ const pct = (n: number) => Math.round((n / totalMod) * 100);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>XScraper · panel de analista</title>
     <meta name="robots" content="noindex, nofollow" />
+    <meta name="color-scheme" content="dark" />
     <link rel="icon" href="data:," />
     <style>
       :root { --bg:#0a0d12; --panel:#121922; --line:#232d3a; --txt:#e8eef6; --dim:#93a1b1; --dim2:#6b7987;
@@ -49,7 +50,7 @@ const pct = (n: number) => Math.round((n / totalMod) * 100);
       .bar { display:flex; align-items:center; gap:10px; font-size:13px; margin-bottom:9px; }
       .bar .name { color:var(--dim); min-width:104px; }
       .bar .track { flex:1; height:5px; background:#1c2530; border-radius:3px; overflow:hidden; }
-      .bar .fill { height:100%; border-radius:3px; background:var(--ok); }
+      .bar .fill { display:block; height:100%; border-radius:3px; background:var(--ok); }
       .bar .fill.b { background:var(--blue); } .bar .fill.v { background:var(--violet); }
       .bar .fill.a { background:var(--amber); }
       .bar .n { color:var(--txt); font-variant-numeric:tabular-nums; min-width:26px; text-align:right; }
@@ -68,7 +69,23 @@ const pct = (n: number) => Math.round((n / totalMod) * 100);
       .err { border:1px solid #4a3a1c; background:#241c0e; color:var(--amber); padding:10px 14px;
              border-radius:9px; font-size:12.5px; margin-bottom:18px; }
       .empty { color:var(--dim2); text-align:center; padding:40px; }
-      @media (max-width:900px) { .kpis,.cols { grid-template-columns:1fr 1fr; } }
+      .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .table-wrap table { min-width:640px; }
+      @media (max-width:900px) {
+        .kpis,.cols { grid-template-columns:1fr 1fr; }
+        .wrap { width:calc(100% - 28px); }
+        header .wrap { gap:8px; }
+        .live { width:100%; margin-left:0; }
+      }
+      @media (max-width:560px) {
+        .kpis,.cols { grid-template-columns:1fr; }
+        .kpi b { font-size:22px; }
+        /* en el teléfono sobran columnas: puesto, modalidad y antigüedad */
+        .offers th:nth-child(2), .offers td:nth-child(2),
+        .offers th:nth-child(5), .offers td:nth-child(5),
+        .offers th:nth-child(6), .offers td:nth-child(6) { display:none; }
+        .table-wrap table { min-width:0; }
+      }
     </style>
   </head>
   <body>
@@ -144,20 +161,20 @@ const pct = (n: number) => Math.round((n / totalMod) * 100);
 
       <div class="box" style="margin-bottom:28px">
         <h2>Empresas con más búsquedas abiertas (top 12 de {radar.companiesTotal})</h2>
-        <table>
+        <div class="table-wrap"><table>
           <thead><tr><th>Empresa</th><th>Búsquedas</th></tr></thead>
           <tbody>
             {radar.companies.map(([name, n]) => (
               <tr><td>{name || '—'}</td><td>{n}</td></tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       </div>
 
       <div class="box">
         <h2>Todas las ofertas ({fmt(radar.total)})</h2>
         {radar.jobs.length ? (
-          <table>
+          <div class="table-wrap"><table class="offers">
             <thead>
               <tr><th>Puesto</th><th>Empresa</th><th>Ubicación</th><th>Modalidad</th><th>Área</th><th>Fuente</th><th>Antig.</th></tr>
             </thead>
@@ -174,7 +191,7 @@ const pct = (n: number) => Math.round((n / totalMod) * 100);
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         ) : (
           <div class="empty">Sin datos. Corré <code>node cli.mjs</code> en XScraper y volvé a desplegar.</div>
         )}

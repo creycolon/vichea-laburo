@@ -240,3 +240,39 @@ footer.site a:hover { color: var(--txt); }
 .tr-ok { color:#8fd6c8; border-color:#1f3f3a; background:#0f201e; }
 .tr-warn { color:#f0b95a; border-color:#4a3a1c; background:#241c0e; }
 .tr-bad { color:#ff9f9f; border-color:#55292c; background:#2a1414; }
+
+
+/* ---------- móvil: la tabla no puede romper el ancho ---------- */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap .table { min-width: 720px; }
+
+@media (max-width: 720px) {
+  .wrap { width: calc(100% - 28px); }
+  .profile-selects { flex-direction: column; gap: 10px; }
+  .toolbar { gap: 8px; }
+  .toolbar .count { margin-left: 0; width: 100%; }
+  .btn, .chip { font-size: 12.5px; }
+  .panel-head { flex-wrap: wrap; gap: 10px; }
+  .panel-head .btn { margin-left: 0 !important; }
+  /* en pantalla chica sobran columnas: quedan puesto, modalidad, señales y afinidad */
+  .table th:nth-child(2), .table td:nth-child(2),
+  .table th:nth-child(5), .table td:nth-child(5),
+  .table th:nth-child(6), .table td:nth-child(6) { display: none; }
+  .table-wrap .table { min-width: 0; }
+}
+
+
+/* ---------- nav en pantallas chicas ---------- */
+@media (max-width: 560px) {
+  .nav .wrap { gap: 8px; height: 58px; }
+  .brand { white-space: nowrap; font-size: 15px; gap: 8px; }
+  .brand .dot { width: 22px; height: 22px; border-radius: 7px; }
+  .nav .actions { gap: 6px; }
+  .nav .actions .btn { padding: 8px 11px; font-size: 13px; white-space: nowrap; }
+  .hero { padding: 40px 0 36px; }
+  h1 { font-size: 30px; }
+  .lead { font-size: 15.5px; }
+  .stats div { padding: 14px 16px; }
+  .stats b { font-size: 24px; }
+  .stats .mods { flex-wrap: wrap; gap: 8px; }
+}
