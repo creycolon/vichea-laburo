@@ -29,3 +29,8 @@ Thumbs.db
 
 # salida del build de Vercel
 .vercel/
+
+# builds de las apps
+apps/*/dist/
+apps/*/.vercel/
+apps/*/.astro/

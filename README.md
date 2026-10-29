@@ -5,6 +5,7 @@ deduplica las ofertas y las normaliza por empresa, ubicación, modalidad y área
 
 ```
 apps/web/     # landing + auth + panel (Astro 5 SSR + Supabase)
+apps/radar/   # panel de analista sobre la salida de XScraper (sin login)
 xscraper/     # XScraper: motor de relevamiento (hoy escribe data.json)
 db/           # schema Postgres: supabase.sql (auth + RLS) y schema.sql (portable)
 docs/         # DER explicado y decisiones de arquitectura
@@ -35,6 +36,16 @@ node cli.mjs --diff   # qué abrió y qué cerró respecto del snapshot anterior
 ```
 
 Detalle del pipeline y cómo agregar una fuente: [`xscraper/README.md`](xscraper/README.md).
+
+## Panel de analista
+
+```bash
+cd apps/radar && npm install && npm run dev   # http://127.0.0.1:4322
+```
+
+Segunda app, sin landing ni registro: KPIs, apertura/cierre diario, distribuciones y tabla
+completa. Se actualiza con el cron de GitHub Actions, que commitea el snapshot y dispara el
+redeploy en Vercel. Detalle en [`apps/radar/README.md`](apps/radar/README.md).
 
 ## Base de datos
 

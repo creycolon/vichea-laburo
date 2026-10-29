@@ -1,0 +1,22 @@
+{
+  "name": "radar",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "sync": "node scripts/sync-data.mjs",
+    "predev": "node scripts/sync-data.mjs",
+    "dev": "astro dev --host 127.0.0.1 --port 4322",
+    "prebuild": "node scripts/sync-data.mjs",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.4.3",
+    "@astrojs/vercel": "^9.0.5",
+    "astro": "^5.14.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

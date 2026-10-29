@@ -1,0 +1,188 @@
+---
+import { radar } from '../lib/data';
+
+const fmt = (n: number) => n.toLocaleString('es-AR');
+const updated = radar.generatedAt
+  ? new Date(radar.generatedAt).toLocaleString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+  : 'sin datos';
+const top = (o: Record<string, number>) => Object.entries(o).sort((a, b) => b[1] - a[1]);
+const totalMod = radar.total || 1;
+const pct = (n: number) => Math.round((n / totalMod) * 100);
+---
+
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>XScraper · panel de analista</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="data:," />
+    <style>
+      :root { --bg:#0a0d12; --panel:#121922; --line:#232d3a; --txt:#e8eef6; --dim:#93a1b1; --dim2:#6b7987;
+              --ok:#3ddc97; --blue:#5aa9f0; --amber:#f0b95a; --violet:#b9a4ff; }
+      * { box-sizing:border-box; }
+      body { margin:0; background:var(--bg); color:var(--txt);
+             font:14.5px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+      .wrap { width:min(1240px, calc(100% - 40px)); margin-inline:auto; }
+      header { border-bottom:1px solid var(--line); padding:20px 0 16px; position:sticky; top:0;
+               background:rgba(10,13,18,.94); backdrop-filter:blur(8px); z-index:10; }
+      header .wrap { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+      h1 { font-size:17px; margin:0; letter-spacing:-.01em; }
+      .tag { font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid var(--line);
+             color:var(--dim2); background:var(--panel); }
+      .live { margin-left:auto; font-size:12px; color:var(--dim2); display:flex; gap:8px; align-items:center; }
+      .dot { width:7px; height:7px; border-radius:50%; background:var(--ok); box-shadow:0 0 8px var(--ok); }
+      main { padding:26px 0 60px; }
+      .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line);
+              border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-bottom:26px; }
+      .kpi { background:var(--panel); padding:18px 20px; }
+      .kpi b { display:block; font-size:26px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+      .kpi span { font-size:12px; color:var(--dim2); }
+      .kpi .delta { font-size:11.5px; margin-top:4px; }
+      .up { color:var(--ok); } .down { color:#ff9f9f; }
+      h2 { font-size:13px; text-transform:uppercase; letter-spacing:.07em; color:var(--dim2);
+           margin:0 0 12px; font-weight:600; }
+      .cols { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+      .box { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+      .bar { display:flex; align-items:center; gap:10px; font-size:13px; margin-bottom:9px; }
+      .bar .name { color:var(--dim); min-width:104px; }
+      .bar .track { flex:1; height:5px; background:#1c2530; border-radius:3px; overflow:hidden; }
+      .bar .fill { height:100%; border-radius:3px; background:var(--ok); }
+      .bar .fill.b { background:var(--blue); } .bar .fill.v { background:var(--violet); }
+      .bar .fill.a { background:var(--amber); }
+      .bar .n { color:var(--txt); font-variant-numeric:tabular-nums; min-width:26px; text-align:right; }
+      table { width:100%; border-collapse:collapse; font-size:13.5px; }
+      th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dim2);
+           padding:9px 10px; border-bottom:1px solid var(--line); font-weight:600; }
+      td { padding:10px; border-bottom:1px solid #1a222c; }
+      tbody tr:hover td { background:#0f151d; }
+      a { color:inherit; text-decoration:none; }
+      td a:hover { color:var(--ok); }
+      .m { font-size:11px; padding:2px 7px; border-radius:5px; border:1px solid var(--line); white-space:nowrap; }
+      .m.remoto { color:#8fd6c8; border-color:#1f3f3a; background:#0f201e; }
+      .m.hibrido { color:var(--amber); border-color:#4a3a1c; background:#241c0e; }
+      .m.presencial { color:var(--violet); border-color:#3b2f5e; background:#1e1830; }
+      .dim { color:var(--dim2); font-size:12px; }
+      .err { border:1px solid #4a3a1c; background:#241c0e; color:var(--amber); padding:10px 14px;
+             border-radius:9px; font-size:12.5px; margin-bottom:18px; }
+      .empty { color:var(--dim2); text-align:center; padding:40px; }
+      @media (max-width:900px) { .kpis,.cols { grid-template-columns:1fr 1fr; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <h1>XScraper <span class="tag">panel de analista</span></h1>
+        <span class="tag">sin registro · datos abiertos</span>
+        <span class="live"><span class="dot"></span>última corrida: {updated}</span>
+      </div>
+    </header>
+
+    <main class="wrap">
+      {radar.errors.length > 0 && (
+        <div class="err"><strong>Fuentes con problemas:</strong> {radar.errors.join(' · ')}</div>
+      )}
+
+      <div class="kpis">
+        <div class="kpi">
+          <b>{fmt(radar.total)}</b><span>ofertas relevadas</span>
+          <div class="delta">
+            {radar.diff.date
+              ? <><span class="up">+{radar.diff.nuevas}</span> nuevas · <span class="down">−{radar.diff.cerradas}</span> cerradas</>
+              : 'sin comparación previa'}
+          </div>
+        </div>
+        <div class="kpi"><b>{fmt(radar.byGeo['Argentina'] ?? 0)}</b><span>en Argentina</span></div>
+        <div class="kpi"><b>{fmt(radar.companiesTotal)}</b><span>empresas distintas</span></div>
+        <div class="kpi"><b>{Object.keys(radar.bySource).length}</b><span>fuentes con resultados</span></div>
+      </div>
+
+      <div class="cols">
+        <div class="box">
+          <h2>Modalidad</h2>
+          {top(radar.byModality).map(([k, v]) => (
+            <div class="bar">
+              <span class="name">{k}</span>
+              <span class="track"><span class="fill" style={`width:${pct(v)}%`}></span></span>
+              <span class="n">{v}</span>
+            </div>
+          ))}
+        </div>
+        <div class="box">
+          <h2>Geografía</h2>
+          {top(radar.byGeo).map(([k, v]) => (
+            <div class="bar">
+              <span class="name">{k}</span>
+              <span class="track"><span class="fill b" style={`width:${pct(v)}%`}></span></span>
+              <span class="n">{v}</span>
+            </div>
+          ))}
+        </div>
+        <div class="box">
+          <h2>Área</h2>
+          {top(radar.byArea).slice(0, 6).map(([k, v]) => (
+            <div class="bar">
+              <span class="name">{k}</span>
+              <span class="track"><span class="fill v" style={`width:${pct(v)}%`}></span></span>
+              <span class="n">{v}</span>
+            </div>
+          ))}
+        </div>
+        <div class="box">
+          <h2>Fuente</h2>
+          {top(radar.bySource).map(([k, v]) => (
+            <div class="bar">
+              <span class="name">{k}</span>
+              <span class="track"><span class="fill a" style={`width:${pct(v)}%`}></span></span>
+              <span class="n">{v}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="box" style="margin-bottom:28px">
+        <h2>Empresas con más búsquedas abiertas (top 12 de {radar.companiesTotal})</h2>
+        <table>
+          <thead><tr><th>Empresa</th><th>Búsquedas</th></tr></thead>
+          <tbody>
+            {radar.companies.map(([name, n]) => (
+              <tr><td>{name || '—'}</td><td>{n}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box">
+        <h2>Todas las ofertas ({fmt(radar.total)})</h2>
+        {radar.jobs.length ? (
+          <table>
+            <thead>
+              <tr><th>Puesto</th><th>Empresa</th><th>Ubicación</th><th>Modalidad</th><th>Área</th><th>Fuente</th><th>Antig.</th></tr>
+            </thead>
+            <tbody>
+              {radar.jobs.map((j) => (
+                <tr>
+                  <td><a href={j.url} target="_blank" rel="noopener">{j.title}</a></td>
+                  <td class="dim">{j.company || '—'}</td>
+                  <td class="dim">{j.geo}</td>
+                  <td><span class={`m ${j.modality === 'híbrido' ? 'hibrido' : j.modality === 'presencial' ? 'presencial' : 'remoto'}`}>{j.modality}</span></td>
+                  <td class="dim">{j.area}</td>
+                  <td class="dim">{j.source}</td>
+                  <td class="dim">{j.days !== null ? `${j.days} d` : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div class="empty">Sin datos. Corré <code>node cli.mjs</code> en XScraper y volvé a desplegar.</div>
+        )}
+      </div>
+
+      <p class="dim" style="margin-top:24px">
+        Generado por XScraper a partir de fuentes públicas. Se actualiza por el cron de GitHub Actions;
+        cada corrida queda versionada en <code>history/</code>.
+      </p>
+    </main>
+  </body>
+</html>
