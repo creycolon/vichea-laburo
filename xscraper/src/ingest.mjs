@@ -260,6 +260,61 @@ export async function applyPlan(supabase, plan, { log = () => {} } = {}) {
     if (!error) stats.runs++;
   }
 
+  // 9. cerrar las que dejaron de aparecer (después de escribir, nunca antes)
+  const closed = await closeStaleJobs(supabase, { days: Number(process.env.CLOSE_AFTER_DAYS ?? 3), log });
+  stats.closed = closed.closed;
+
   log(JSON.stringify(stats));
   return stats;
+}
+
+/**
+ * Cierra las ofertas que dejaron de aparecer.
+ *
+ * Sin esto `status` queda `open` para siempre y "cuántos días lleva abierta" —el dato que
+ * se le vende a un reclutador— se vuelve mentira.
+ *
+ * Dos salvaguardas:
+ *  - sólo se cierran ofertas de fuentes que tuvieron una corrida exitosa después del corte
+ *    (si un portal se cae, sus ofertas no se dan por cerradas);
+ *  - hace falta `days` sin aparecer, no una sola corrida.
+ */
+export async function closeStaleJobs(supabase, { days = 3, log = () => {} } = {}) {
+  const cutoff = new Date(Date.now() - days * 864e5).toISOString();
+
+  const { data: runs, error: runErr } = await supabase
+    .from('crawl_runs').select('source_id,finished_at')
+    .eq('status', 'ok').gte('finished_at', cutoff);
+  if (runErr) throw new Error(`crawl_runs: ${runErr.message}`);
+  const healthy = new Set((runs ?? []).map((r) => r.source_id));
+  if (!healthy.size) {
+    log('cierre: ninguna fuente tuvo corrida exitosa reciente, no se cierra nada');
+    return { closed: 0, reason: 'sin corridas recientes' };
+  }
+
+  const { data: stale, error: staleErr } = await supabase
+    .from('jobs')
+    .select('id,title,job_source_records(source_id)')
+    .eq('status', 'open')
+    .lt('last_seen_at', cutoff);
+  if (staleErr) throw new Error(`jobs(stale): ${staleErr.message}`);
+
+  const toClose = (stale ?? []).filter((j) => {
+    const sources = (j.job_source_records ?? []).map((r) => r.source_id);
+    return sources.some((s) => healthy.has(s));
+  });
+  if (!toClose.length) return { closed: 0 };
+
+  const ids = toClose.map((j) => j.id);
+  const now = new Date().toISOString();
+  const { error: upErr } = await supabase.from('jobs')
+    .update({ status: 'closed', closed_at: now }).in('id', ids);
+  if (upErr) throw new Error(`jobs(close): ${upErr.message}`);
+
+  const { error: evErr } = await supabase.from('job_events')
+    .insert(ids.map((id) => ({ job_id: id, kind: 'closed' })));
+  if (evErr) throw new Error(`job_events(close): ${evErr.message}`);
+
+  log(`cierre: ${ids.length} ofertas cerradas (sin aparecer por ${days} días)`);
+  return { closed: ids.length };
 }
