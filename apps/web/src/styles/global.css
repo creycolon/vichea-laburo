@@ -280,3 +280,7 @@ footer.site a:hover { color: var(--txt); }
   .stats b { font-size: 24px; }
   .stats .mods { flex-wrap: wrap; gap: 8px; }
 }
+
+/* hueco de precio mientras no hay valores definidos */
+.price-tbd { margin:6px 0 4px; font-size:13px; letter-spacing:.02em; color:var(--dim-2);
+             border:1px dashed var(--line); border-radius:8px; padding:6px 10px; display:inline-block; }
