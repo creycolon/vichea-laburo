@@ -1,30 +1,58 @@
 # Prospección de DMs en X
 
-Herramienta local para contactar reclutadores sin parecer envío masivo. **No busca gente ni
-scrapea X**: eso viola sus términos y expone la cuenta. El descubrimiento lo hacés vos (la
-búsqueda de X es buena para eso); el script se ocupa de lo repetitivo.
+Herramienta local para descubrir cuentas de RRHH por rubro y contactar reclutadores sin parecer
+envío masivo. **No scrapea X directamente**: el descubrimiento corre por Apify (un tercero), y el
+script se ocupa de lo repetitivo. El envío de DMs sigue siendo manual y con cupo diario.
 
 ## Descubrimiento automático (Apify)
 
 X no tiene búsqueda pública de personas y Nitter quedó dado de baja por reclamos legales. La vía
-que funciona es **Apify**, que ya usás para Computrabajo: el actor `apidojo/tweet-scraper` cobra
-**US$0,0001 por tweet** (1.000 tuits = 10 centavos) y el tier gratuito da US$5 mensuales.
+que funciona es **Apify**, que ya usás para Computrabajo. Hay dos actors, y hacen cosas distintas:
+
+| Vía | Actor | Qué encuentra | Datos que trae |
+|---|---|---|---|
+| **Perfil** (`--via perfiles`) | `apidojo/twitter-user-scraper` | cuentas que se definen como RRHH/reclutamiento en su bio | bio, ubicación, web, seguidores, `canDm`, tipo de cuenta |
+| **Actividad** (`--via tuits`) | `apidojo/tweet-scraper` | cuentas que están publicando búsquedas ahora | autor, seguidores y verificación (sin bio) |
+
+La vía de perfil es la principal: encuentra **personas, empresas y grupos** y los clasifica con una
+heurística sobre la bio (más el `professional_type` de X cuando existe). La de tuits aporta la señal
+de que la cuenta está publicando búsquedas ahora.
+
+**Costo actual** (2026): US$0,008 por búsqueda de usuarios + US$0,0004 por usuario extra (los
+primeros ~20 de cada búsqueda son gratis); US$0,0004 por tuit. Un rubro con 8 búsquedas y 100 ítems
+ronda **US$0,06**.
+
+> ⚠️ El plan free de Apify no permite correr actors por API (solo demo: 5 corridas/mes de 10
+> ítems). Para automatizar hace falta un plan pago.
+
+### Por rubro
+
+Los rubros se definen en `rubros.json`. Cada entrada tiene `nombre`, `descripcion`, `usuarios`
+(búsquedas de perfil), `tuits` (búsquedas de posts) y `excluir` (frases para descartar cuentas).
 
 ```bash
-echo 'APIFY_TOKEN=apify_api_...' > .env     # https://console.apify.com/account/integrations
-
-node discover.mjs "recruiter CABA"          # muestra los autores
-node discover.mjs "recruiter CABA" --save   # los agrega como pendientes
-node discover.mjs '("buscamos" OR "estamos buscando") junior (CABA OR Argentina) lang:es -filter:replies since:2026-10-15' --max 200 --save
+node discover.mjs rubros                          # lista los rubros
+node discover.mjs --rubro rrhh --dry-run          # muestra búsquedas y costo, sin gastar
+node discover.mjs --rubro rrhh                    # busca y muestra (no guarda)
+node discover.mjs --rubro rrhh --save             # guarda en cuentas-por-rubro.json
+node discover.mjs --rubro rrhh --via ambas --save # suma la señal de tuits
+node discover.mjs --rubro rrhh --tipo persona --prospectos
 ```
 
-Toma los autores únicos de los tuits que matchean la query, descarta los que ya están en la lista
-y guarda nombre, handle y bio (la bio se usa como nota al lado del mensaje).
+`cuentas-por-rubro.json` es el relevamiento (personas + empresas + grupos) y está en `.gitignore`.
+`--prospectos` copia los elegidos a `prospectos.json` para el flujo de DM de abajo.
+
+### Query directa (modo viejo)
+
+```bash
+node discover.mjs "recruiter CABA" --save
+node discover.mjs '("buscamos" OR "estamos buscando") junior (CABA OR Argentina) lang:es -filter:replies' --max 200 --save
+```
 
 ## Flujo
 
 ```bash
-# 1. agregás los que encontraste
+# 1. agregás los que encontraste (o los copiás con discover.mjs --prospectos)
 node cli.mjs add --handle @ana --nombre Ana --empresa ACME --nota "recluta backend"
 
 # 2. el script te da el mensaje ya personalizado
@@ -80,9 +108,11 @@ justamente las que menos contestan DMs. Rango útil: **5 a 20**.
 Excluye a quien está publicando búsquedas, que es exactamente la señal de que está contratando.
 Conviene usarlo solo si buscás cuentas de contenido, no reclutadores en activo.
 
-Filtrá por personas (no cuentas de empresa), mirá si tienen el DM abierto y anotá en `--nota`
-algo real del perfil: es lo que hace que el mensaje no parezca plantilla.
+Para DM, priorizá **personas**: las empresas y grupos sirven para el mapa y para detectar quién
+contrata, pero contestan menos. Mirá si tienen el DM abierto y anotá en `--nota` algo real del
+perfil: es lo que hace que el mensaje no parezca plantilla.
 
 ## Privacidad
 
-`prospectos.json` contiene datos de personas reales: está en `.gitignore`, no se versiona.
+`prospectos.json` y `cuentas-por-rubro.json` contienen datos de personas reales: están en
+`.gitignore`, no se versionan.

@@ -37,6 +37,7 @@ apps/*/.astro/
 
 # datos de prospección (personas reales, no van al repo)
 prospectos/prospectos.json
+prospectos/cuentas-por-rubro.json
 
 # token de Apify para descubrimiento (nunca al repo)
 prospectos/.env

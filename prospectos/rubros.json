@@ -1,0 +1,49 @@
+{
+  "rrhh": {
+    "nombre": "RRHH / Reclutamiento",
+    "descripcion": "Reclutadores, consultoras de selección, agencias y comunidades de empleo en Argentina y LATAM.",
+    "usuarios": [
+      "reclutador Argentina",
+      "reclutadora Argentina",
+      "recruiter Argentina",
+      "talent acquisition Argentina",
+      "headhunter Argentina",
+      "RRHH Argentina",
+      "recursos humanos CABA",
+      "selección de personal Buenos Aires"
+    ],
+    "tuits": [
+      "(\"buscamos\" OR \"estamos buscando\") (junior OR trainee OR \"sin experiencia\") (CABA OR Argentina) lang:es -filter:replies",
+      "(\"reclutador\" OR \"recruiter\" OR \"talent acquisition\") (CABA OR Argentina) lang:es -filter:replies"
+    ],
+    "excluir": [
+      "busco trabajo",
+      "buscando trabajo",
+      "busco empleo",
+      "open to work",
+      "desempleado"
+    ]
+  },
+  "rrhh-tech": {
+    "nombre": "Reclutamiento IT",
+    "descripcion": "Reclutadores y consultoras especializadas en perfiles tecnológicos, el público natural de Vichea Laburo.",
+    "usuarios": [
+      "IT recruiter Argentina",
+      "recruiter tech Argentina",
+      "talent acquisition IT LATAM",
+      "reclutador IT Buenos Aires",
+      "tech recruiter CABA",
+      "sourcer tech Argentina"
+    ],
+    "tuits": [
+      "(\"buscamos\" OR \"estamos buscando\") (developer OR dev OR backend OR frontend OR \"full stack\") (CABA OR Argentina) lang:es -filter:replies"
+    ],
+    "excluir": [
+      "busco trabajo",
+      "buscando trabajo",
+      "busco empleo",
+      "open to work",
+      "desempleado"
+    ]
+  }
+}
